@@ -5,20 +5,27 @@
     </head>
 
     <body>
-        <h1 id="header1">Item Lister <span style="color: blue;">Blue</span></h1>
-        <h2 id="header2">Add Items</h2>
-        <form>
-            <input type="text">
-            <input type="submit" value="Submit">
-        </form>
-        <h2>Items</h2>
-        <ul id="items">
-            <li id="items1">Item1</li>
-            <li>Item2</li>
-            <li>Item3</li>
-            <li>Item4</li>
-        </ul>
+        <div class="container">
+            <h1 id="header1">Item Lister <span style="color: blue;">Blue</span></h1>
+        </div>
 
+        <div class="container">
+            <div class="card card-body">
+                <h2 id="header2">Add Items</h2>
+                <form>
+                    <input type="text">
+                    <input type="submit" value="Submit">
+                </form>
+
+                <h2>Items</h2>
+                <ul id="items" class="list-group">
+                    <li class="list-group-item">Item 1</li>
+                    <li class="list-group-item">Item 2</li>
+                    <li class="list-group-item">Item 3</li>
+                    <li class="list-group-item">Item 4</li>
+                </ul>
+            </div>
+        </div>
         <script src="dom.js"></script>
     </body>
 </html>
