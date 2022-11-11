@@ -5,25 +5,26 @@
     </head>
 
     <body>
-        <div class="container">
-            <h1 id="header1">Item Lister <span style="color: blue;">Blue</span></h1>
-        </div>
-
+        <header id="main-header">
+            <div class="container">
+                <h1 id="header1">Item Lister <span style="color: blue;">Blue</span></h1>
+            </div>
+        </header>
         <div class="container">
             <div class="card card-body">
-                <h2 id="header2">Add Items</h2>
+                <h2 id="header2" class="title">Add Items</h2>
                 <form>
                     <input type="text">
                     <input type="submit" value="Submit">
                 </form>
 
-                <h2>Items</h2>
+                <h2 class="title">Items</h2>
                 <ul id="items" class="list-group">
                     <li class="list-group-item">Item 1</li>
                     <li class="list-group-item">Item 2</li>
                     <li class="list-group-item">Item 3</li>
                     <li class="list-group-item">Item 4</li>
-                    <li>Item Without ClassName</li>
+                    <!-- <li>Item Without ClassName</li> -->
                 </ul>
             </div>
         </div>
