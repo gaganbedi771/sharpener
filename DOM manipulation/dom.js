@@ -14,10 +14,17 @@
 
 //document.getElementById('header2').style.color='green'
 //document.getElementById('header2').style.fontWeight='bold';
-let items=document.getElementsByClassName('list-group-item');
-console.log(items);
-items[2].textContent='Text Changed';
-items[2].style.backgroundColor='green';
-for(let i of items){
+// let items=document.getElementsByClassName('list-group-item');
+// console.log(items);
+// items[2].textContent='Text Changed';
+// items[2].style.backgroundColor='green';
+// for(let i of items){
+//     i.style.fontWeight='bold';
+// }
+
+let li=document.getElementsByTagName('li');
+console.log(li);
+
+for(let i of li){
     i.style.fontWeight='bold';
 }
