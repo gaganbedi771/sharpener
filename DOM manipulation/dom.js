@@ -80,14 +80,18 @@ let h1=document.querySelector('header h1');
 container.insertBefore(newDiv, h1);
 console.log(newDiv);
 
-let newDiv2=document.createElement('div');
-newDiv2.id='Hello2 id';
+// let newDiv2=document.createElement('div');
+// newDiv2.id='Hello2 id';
 
-let liEle=document.createElement('li');
-let textNode2=document.createTextNode('HelloWorld');
-liEle.appendChild(textNode2);
-console.log(liEle.textContent);
+// let liEle=document.createElement('li');
+// let textNode2=document.createTextNode('HelloWorld');
+// liEle.appendChild(textNode2);
+// console.log(liEle.textContent);
 
-let parent=document.getElementById('main');
-let before=document.getElementById('items');
-parent.insertBefore(liEle,before);
+// let parent=document.getElementById('main');
+// let before=document.getElementById('items');
+// parent.insertBefore(liEle,before);
+let parentnode=document.getElementById('items');
+// parentnode.appendChild(newli);
+parentnode.innerHTML='<li class="list-group-item">HelloWorld</li>'+parentnode.innerHTML;
+
