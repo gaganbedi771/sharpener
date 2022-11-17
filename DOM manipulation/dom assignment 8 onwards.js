@@ -9,22 +9,28 @@ function addItem(e){
     e.preventDefault();
     //get input value
     let newItem=document.getElementById('item');
+    let newItem2=document.getElementById('item2'); //text box added later
     
     //create li element
     let newli=document.createElement('li');
     newli.className='list-group-item';
 
     //create textnode and append in li
-    newli.appendChild(document.createTextNode(newItem.value + ' '));
-    
+    let lineBreak=document.createElement('br');
+    newli.appendChild(document.createTextNode(newItem.value+' '));
+    newli.append(lineBreak);
+    newli.append(newItem2.value+' ');
+    newItem.value='';
+    newItem2.value='';
+
     //create delete button
     let deletebtn=document.createElement('button');
     
     //add classes to del button
-    deletebtn.className='btn btn-danger btn-sm float-right delete'
+    deletebtn.className='btn btn-danger btn-sm float-right delete';
     deletebtn.appendChild(document.createTextNode('X'));
     //append button to li
-    newli.appendChild(deletebtn);
+    newli.append(deletebtn);
 
     //append newli to items
     itemList.appendChild(newli);
@@ -33,7 +39,7 @@ function addItem(e){
     //create element button
     let editbtn=document.createElement('button');
     editbtn.appendChild(document.createTextNode('Edit'));
-    newli.appendChild(editbtn);
+    newli.append(editbtn);
 }
 
 //to delete listitem
@@ -56,3 +62,48 @@ for(let i of litems){
     editbtn.appendChild(document.createTextNode('Edit'));
     i.appendChild(editbtn);
 }
+
+//search items
+let filter=document.getElementById('filter');
+//create event
+filter.addEventListener('keyup',filteritems);
+
+function filteritems(e){
+    e.preventDefault();
+
+    //convert in input to lowercase;
+    let text=e.target.value.toLowerCase();
+
+    let liItems=document.querySelectorAll('.list-group-item');
+
+    //saving all li elements text in array 
+    let arrayItems=[];
+    for(let i of liItems){
+        arrayItems.push(i.textContent.toLowerCase());
+    }
+
+    //check if input is present in each element of array
+    for(let i in arrayItems){
+        if(arrayItems[i].indexOf(text)!=-1){
+            liItems[i].style.display='block';
+        }
+        else{
+            liItems[i].style.display='none';
+        }
+   }
+}
+
+//adding new input text box 
+let formid=document.getElementById('addForm');
+
+//create element with className,id and attributes
+let newBox=document.createElement('input');
+newBox.setAttribute('type','text');
+newBox.className='form-control mr-2';
+newBox.id='item2';
+
+//inserting box
+formid.insertBefore(newBox,formid.children[1]);
+
+//appending value to li in line no. 12 onwards.
+
