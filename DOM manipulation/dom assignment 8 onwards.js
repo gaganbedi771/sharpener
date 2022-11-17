@@ -58,9 +58,10 @@ function removeItem(e){
 let litems=document.getElementsByClassName('list-group-item');
 
 for(let i of litems){
+    i.append(document.createTextNode(''));
     let editbtn=document.createElement('button');
     editbtn.appendChild(document.createTextNode('Edit'));
-    i.appendChild(editbtn);
+    i.append(editbtn);
 }
 
 //search items
@@ -78,13 +79,16 @@ function filteritems(e){
 
     //saving all li elements text in array 
     let arrayItems=[];
+    let arrayDes=[];
     for(let i of liItems){
-        arrayItems.push(i.textContent.toLowerCase());
+        arrayItems.push(i.firstChild.textContent.toLowerCase()); 
+        arrayDes.push(i.childNodes[2].textContent.toLowerCase());
     }
-
+    console.log(arrayDes);
+    
     //check if input is present in each element of array
     for(let i in arrayItems){
-        if(arrayItems[i].indexOf(text)!=-1){
+        if(arrayItems[i].indexOf(text)!=-1 || arrayDes[i].indexOf(text)!=-1){
             liItems[i].style.display='block';
         }
         else{
@@ -106,4 +110,3 @@ newBox.id='item2';
 formid.insertBefore(newBox,formid.children[1]);
 
 //appending value to li in line no. 12 onwards.
-
