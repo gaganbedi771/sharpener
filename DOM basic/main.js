@@ -89,8 +89,15 @@ form.addEventListener('submit',onSubmit);
 
 function onSubmit(e){
   e.preventDefault();
-  console.log(nameInput.value,emailInput.value);
-  localStorage.setItem('name',nameInput.value);
-  localStorage.setItem('email',emailInput.value);
+  // localStorage.setItem('name',nameInput.value);
+  // localStorage.setItem('email',emailInput.value);
+  
+  //save as objects
+  localStorage.setItem(nameInput.value,JSON.stringify({
+    name:nameInput.value,
+    email:emailInput.value
+  }));
+  let i = JSON.parse(localStorage.getItem('ga'));
+  console.log(i.email);
 }
 
