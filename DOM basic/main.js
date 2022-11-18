@@ -82,13 +82,14 @@
 //Save details to local storage
 
 let form=document.getElementById('my-form');
-let nameInput=document.getElementById('name');
-let emailInput=document.getElementById('email');
+
 
 form.addEventListener('submit',onSubmit);
 
 function onSubmit(e){
   e.preventDefault();
+  let nameInput=document.getElementById('name');
+  let emailInput=document.getElementById('email');
   // localStorage.setItem('name',nameInput.value);
   // localStorage.setItem('email',emailInput.value);
   
@@ -97,7 +98,28 @@ function onSubmit(e){
     name:nameInput.value,
     email:emailInput.value
   }));
-  let i = JSON.parse(localStorage.getItem('ga'));
-  console.log(i.email);
-}
+  // let i = JSON.parse(localStorage.getItem('b'));
+  // console.log(i.email);
+  
+  //get all registered users and add to li elements  
 
+  let li=document.createElement('li');
+  li.className='item';
+  li.appendChild(document.createTextNode(`${nameInput.value} ${emailInput.value}`));
+  console.log(li)
+  let users=document.getElementById('users');
+  users.appendChild(li);
+  nameInput.value='';
+  emailInput.value='';
+}
+let keys=Object.keys(localStorage);
+for(let k of keys){
+  let n=JSON.parse(localStorage.getItem(k)).name;
+  let e=JSON.parse(localStorage.getItem(k)).email;
+  let li=document.createElement('li');
+  li.className='item';
+  li.appendChild(document.createTextNode(`${n} ${e}`));
+  console.log(li);
+  let users=document.getElementById('users');
+  users.appendChild(li);
+}
