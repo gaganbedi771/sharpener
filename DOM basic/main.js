@@ -82,8 +82,6 @@
 //Save details to local storage
 
 let form=document.getElementById('my-form');
-
-
 form.addEventListener('submit',onSubmit);
 
 function onSubmit(e){
@@ -93,20 +91,25 @@ function onSubmit(e){
   // localStorage.setItem('name',nameInput.value);
   // localStorage.setItem('email',emailInput.value);
   
+  //if email(which is unique) already present in db, remove the previous value from screen
+  
+  if(JSON.parse(localStorage.getItem(emailInput.value))!== null){
+    let childToRemove=document.getElementById(emailInput.value);
+    childToRemove.remove();
+  }
+
   //save as objects
-  localStorage.setItem(nameInput.value,JSON.stringify({
+  localStorage.setItem(emailInput.value,JSON.stringify({
     name:nameInput.value,
     email:emailInput.value
   }));
-  // let i = JSON.parse(localStorage.getItem('b'));
-  // console.log(i.email);
-  
+ 
   //get all registered users and add to li elements  
-
   let li=document.createElement('li');
   li.className='item';
+  li.id=emailInput.value;
   li.appendChild(document.createTextNode(`${nameInput.value} ${emailInput.value}`));
-  //console.log(li)
+  appendButtonToLi(li);
   let users=document.getElementById('users');
   users.appendChild(li);
   nameInput.value='';
@@ -114,12 +117,48 @@ function onSubmit(e){
 }
 let keys=Object.keys(localStorage);
 for(let k of keys){
+  
   let n=JSON.parse(localStorage.getItem(k)).name;
   let e=JSON.parse(localStorage.getItem(k)).email;
   let li=document.createElement('li');
   li.className='item';
-  li.appendChild(document.createTextNode(`${n} ${e}`));
-  //console.log(li);
+  li.id=e;
+  li.appendChild(document.createTextNode(`${n} ${e} `));
+  appendButtonToLi(li);
   let users=document.getElementById('users');
   users.appendChild(li);
+}
+
+function appendButtonToLi(li){
+  let btnDel=document.createElement('button');
+  let btnEdit=document.createElement('button');
+  btnDel.className='btn-delete';
+  btnEdit.className='btn-edit';
+  btnEdit.appendChild(document.createTextNode('Edit'));
+  btnDel.appendChild(document.createTextNode('Delete'));
+  li.append(btnEdit);
+  li.append(btnDel);
+}
+
+let users=document.getElementById('users');
+users.addEventListener('click',alterItem);
+
+function alterItem(e){
+  e.preventDefault();
+  let editId=e.target.parentNode.id;
+  if(e.target.classList.contains('btn-delete') ){
+    console.log('delete');
+
+    localStorage.removeItem(editId);
+    e.target.parentNode.remove();
+
+  }
+  else if(e.target.classList.contains('btn-edit')){
+    console.log('edit pressed');
+    
+    document.getElementById('name').value=JSON.parse(localStorage.getItem(editId)).name;
+    document.getElementById('email').value=JSON.parse(localStorage.getItem(editId)).email;
+    localStorage.removeItem(editId);
+    e.target.parentNode.remove();
+  }
 }
