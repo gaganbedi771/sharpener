@@ -106,7 +106,7 @@ function onSubmit(e){
   let li=document.createElement('li');
   li.className='item';
   li.appendChild(document.createTextNode(`${nameInput.value} ${emailInput.value}`));
-  console.log(li)
+  //console.log(li)
   let users=document.getElementById('users');
   users.appendChild(li);
   nameInput.value='';
@@ -119,7 +119,7 @@ for(let k of keys){
   let li=document.createElement('li');
   li.className='item';
   li.appendChild(document.createTextNode(`${n} ${e}`));
-  console.log(li);
+  //console.log(li);
   let users=document.getElementById('users');
   users.appendChild(li);
 }
