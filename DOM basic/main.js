@@ -1,25 +1,25 @@
 //My Events
-const btn = document.querySelector('.btn');
-btn.addEventListener('click', (e)=>{
-  e.preventDefault();
-  console.log('Click');
-})
-btn.addEventListener('mouseover', (e)=>{
-  console.log('MouseHovering')
-})
-btn.addEventListener('mouseout',(e)=>{
-  console.log('Mouseout')
-})
+// const btn = document.querySelector('.btn');
+// btn.addEventListener('click', (e)=>{
+//   e.preventDefault();
+//   console.log('Click');
+// })
+// btn.addEventListener('mouseover', (e)=>{
+//   console.log('MouseHovering')
+// })
+// btn.addEventListener('mouseout',(e)=>{
+//   console.log('Mouseout')
+// })
 
-const myForm = document.querySelector('#my-form');
-const name = document.querySelector('#name');
-const email = document.querySelector('#email');
-myForm.addEventListener('submit', onSubmit);
+// const myForm = document.querySelector('#my-form');
+// const name = document.querySelector('#name');
+// const email = document.querySelector('#email');
+// myForm.addEventListener('submit', onSubmit);
 
-function onSubmit(e){
-  //e.preventDefault();
-  console.log(nameInput);
-}
+// function onSubmit(e){
+//   e.preventDefault();
+//   console.log(name.val);
+// }
 // EVENTS
 
 // Mouse Event
@@ -78,3 +78,19 @@ function onSubmit(e){
 //     emailInput.value = '';
 //   }
 // }
+
+//Save details to local storage
+
+let form=document.getElementById('my-form');
+let nameInput=document.getElementById('name');
+let emailInput=document.getElementById('email');
+
+form.addEventListener('submit',onSubmit);
+
+function onSubmit(e){
+  e.preventDefault();
+  console.log(nameInput.value,emailInput.value);
+  localStorage.setItem('name',nameInput.value);
+  localStorage.setItem('email',emailInput.value);
+}
+
