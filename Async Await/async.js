@@ -104,11 +104,7 @@ async function f() {
         post.push(create3);
 
         setTimeout(() => {
-            let output = '';
-            post.forEach((p) => {
-                output += `<li>${p.title}</li>`;
-            })
-            document.body.innerHTML = output;
+            createAllposts(post);
             resolve('Post 3 created');
         }, 1000)
 
