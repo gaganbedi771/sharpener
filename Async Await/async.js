@@ -112,16 +112,15 @@ async function f() {
     await createPost3;
 
     let deletePosts=new Promise((resolve,reject)=>{
-            console.log(post.length);
-            setTimeout(()=>{
-                deletelast(post);
-            },1000);
-            setTimeout(()=>{
-                deletelast(post);
-            },2000);
-            setTimeout(()=>{
-                deletelast(post);
-            },3000);
+            
+            let len=post.length;
+            let i=1;
+            while(len>0){
+                setTimeout(()=>{
+                    deletelast(post);
+                },(i++)*1000);
+                len--
+            }
         setTimeout(()=>{resolve('deleted')},3500);
     })
     await deletePosts;
