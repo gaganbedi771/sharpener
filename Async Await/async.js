@@ -70,7 +70,6 @@ let post = [
     { title: 'post One' },
     { title: 'post Two' }
 ];
-//post=[];
 
 async function f() {
     function createAllposts(post){
@@ -85,7 +84,7 @@ async function f() {
                 createAllposts(post);
                 
     }
-    let getPosts = new Promise((resolve, reject) => {
+    let getPosts =await new Promise((resolve, reject) => {
         setTimeout(() => {
             let len = post.length;
             if (len > 0) {
@@ -97,9 +96,8 @@ async function f() {
             }
         }, 2000);
     });
-    await getPosts;
 
-    let createPost3 = new Promise((resolve, reject) => {
+    let createPost3 = await new Promise((resolve, reject) => {
         let create3 = { title: 'post Three' };
         post.push(create3);
 
@@ -109,9 +107,8 @@ async function f() {
         }, 1000)
 
     })
-    await createPost3;
 
-    let deletePosts=new Promise((resolve,reject)=>{
+    let deletePosts=await new Promise((resolve,reject)=>{
             
             let len=post.length;
             let i=1;
@@ -123,7 +120,6 @@ async function f() {
             }
         setTimeout(()=>{resolve('deleted')},3500);
     })
-    await deletePosts;
     return ('Done');
 }
 
