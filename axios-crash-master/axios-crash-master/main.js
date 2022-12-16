@@ -1,36 +1,87 @@
 // GET REQUEST
 function getTodos() {
   console.log('GET Request');
+  axios.get('https://jsonplaceholder.typicode.com/todos', { params: { _limit: 5 } })
+    .then(res => showOutput(res))
+    .catch(err => console.log(err))
 }
 
 // POST REQUEST
 function addTodo() {
   console.log('POST Request');
+  axios.post('https://jsonplaceholder.typicode.com/todos', {
+    title: 'NEW todo',
+    completed: false
+  })
+    .then(res => showOutput(res))
+    .catch(err => console.log(err));
 }
+
 
 // PUT/PATCH REQUEST
 function updateTodo() {
   console.log('PUT/PATCH Request');
+  axios.patch('https://jsonplaceholder.typicode.com/todos/1', { title: 'updated', completed: false })
+    .then(res => showOutput(res))
+    .catch(err => console.log(err));
 }
 
 // DELETE REQUEST
 function removeTodo() {
   console.log('DELETE Request');
+  axios.delete('https://jsonplaceholder.typicode.com/todos/1')
+    .then(res => showOutput(res))
+    .catch(err => console.log(err));
 }
 
 // SIMULTANEOUS DATA
 function getData() {
   console.log('Simultaneous Request');
+  axios.all([
+    axios.get('https://jsonplaceholder.typicode.com/todos'),
+    axios.get('https://jsonplaceholder.typicode.com/posts'),
+  ])
+    // .then(res=>{
+    //   console.log(res[0]);
+    //   console.log(res[1]);
+    //   showOutput(res[1]);
+    // })
+    .then(axios.spread((todo, post) => { showOutput(post) }))
+    .catch(err => console.log(err))
 }
 
 // CUSTOM HEADERS
 function customHeaders() {
   console.log('Custom Headers');
+  const config={
+    headers:{
+      'Content-Type':'application/json',
+      Authorization:'SomeToken'
+    }
+  }
+  axios.post('https://jsonplaceholder.typicode.com/todos',{
+    title:'New Todo',
+    completed:false
+  },config)
+  .then(res=>showOutput(res));
 }
 
 // TRANSFORMING REQUESTS & RESPONSES
 function transformResponse() {
   console.log('Transform Response');
+  const options={
+    method:'post',
+    url:'https://jsonplaceholder.typicode.com/todos',
+    data:{
+      title:'Hello World'
+    },
+    transformResponse: axios.defaults.transformResponse.concat(data=>{
+      data.title=data.title.toUpperCase();
+      return data;
+    })
+  }
+
+  axios(options).then(res=>showOutput(res));
 }
 
 // ERROR HANDLING
@@ -44,7 +95,14 @@ function cancelToken() {
 }
 
 // INTERCEPTING REQUESTS & RESPONSES
-
+axios.interceptors.request.use(
+  config=>{
+  console.log(
+    `${config.method.toUpperCase()} request sent to ${
+      config.url
+    } at ${new Date().getTime()}`);
+    return config;
+},error=>{return Promise.reject(error)});
 // AXIOS INSTANCES
 
 // Show output in browser
