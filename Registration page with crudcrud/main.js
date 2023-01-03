@@ -88,9 +88,19 @@ function alterItem(e) {
     e.preventDefault();
     let editId = e.target.parentNode.id;
     if (e.target.classList.contains('btn-delete')) {
-        console.log('delete');
-
-        localStorage.removeItem(editId);
+        console.log('delete',editId);
+        axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
+        .then((res) => {
+            for (let i = 0; i < res.data.length; i++) {
+                if(res.data[i].email==editId){
+                    let idToDel=res.data[i]._id;
+                    let link='https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/'+idToDel;
+                    axios.delete(link);
+                    break;
+                }
+            }
+        })
+        .catch(err => console.log(err))
         e.target.parentNode.remove();
 
     }
