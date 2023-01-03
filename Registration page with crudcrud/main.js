@@ -22,32 +22,42 @@ function onSubmit(e) {
     //     name:nameInput.value,
     //     email:emailInput.value
     //   }));
+    let id;
     axios.post("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData", { name: nameInput.value, email: emailInput.value })
-        .then(res => console.log(res))
+        .then((res) => {
+            console.log(res);
+            axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
+                .then((res1) => {
+                    id = res1.data[res1.data.length - 1]._id;
+                    console.log(id)
+                    //get all registered users and add to li elements    
+                    let li = document.createElement('li');
+                    li.className = 'item';
+                    li.id = id;
+                    li.appendChild(document.createTextNode(`${nameInput.value} ${emailInput.value}`));
+                    appendButtonToLi(li);
+                    let users = document.getElementById('users');
+                    users.appendChild(li);
+                    nameInput.value = '';
+                    emailInput.value = '';
+                })
+        })
         .catch(err => console.log(err))
 
-    //get all registered users and add to li elements  
-    let li = document.createElement('li');
-    li.className = 'item';
-    li.id = emailInput.value;
-    li.appendChild(document.createTextNode(`${nameInput.value} ${emailInput.value}`));
-    appendButtonToLi(li);
-    let users = document.getElementById('users');
-    users.appendChild(li);
-    nameInput.value = '';
-    emailInput.value = '';
+
 }
 
 //fetch from storage and display
 window.addEventListener('DOMContentLoaded', () => {
     axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
         .then((res) => {
+            //axios.delete('https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/63b479de32f90d03e8f0f9d3    ') 
             for (let i = 0; i < res.data.length; i++) {
                 let n = res.data[i].name;
                 let e = res.data[i].email;
                 let li = document.createElement('li');
                 li.className = 'item';
-                li.id = e;
+                li.id = res.data[i]._id;
                 li.appendChild(document.createTextNode(`${n} ${e} `));
                 appendButtonToLi(li);
                 let users = document.getElementById('users');
@@ -87,20 +97,23 @@ users.addEventListener('click', alterItem);
 function alterItem(e) {
     e.preventDefault();
     let editId = e.target.parentNode.id;
+    console.log(editId)
     if (e.target.classList.contains('btn-delete')) {
-        console.log('delete',editId);
-        axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
-        .then((res) => {
-            for (let i = 0; i < res.data.length; i++) {
-                if(res.data[i].email==editId){
-                    let idToDel=res.data[i]._id;
-                    let link='https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/'+idToDel;
-                    axios.delete(link);
-                    break;
-                }
-            }
-        })
-        .catch(err => console.log(err))
+        console.log('delete', editId);
+        let link = 'https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/' + editId;
+        axios.delete(link);
+        // axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
+        //     .then((res) => {
+        //         for (let i = 0; i < res.data.length; i++) {
+        //             if (res.data[i].email == editId) {
+        //                 let idToDel = res.data[i]._id;
+        //                 let link = 'https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/' + idToDel;
+        //                 axios.delete(link);
+        //                 break;
+        //             }
+        //         }
+        //     })
+        //     .catch(err => console.log(err))
         e.target.parentNode.remove();
 
     }
