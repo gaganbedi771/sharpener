@@ -2,16 +2,16 @@
 
 let form = document.getElementById('my-form');
 form.addEventListener('submit', onSubmit);
-
+let crudLink='https://crudcrud.com/api/63896662c41e447ba267b367901ffab9/appointmentData';
 function onSubmit(e) {
     e.preventDefault();
     let nameInput = document.getElementById('name');
     let emailInput = document.getElementById('email');
-    
-    axios.post("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData", { name: nameInput.value, email: emailInput.value })
+
+    axios.post(crudLink, { name: nameInput.value, email: emailInput.value })
         .then((res) => {
             console.log(res);
-            axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
+            axios.get(crudLink)
                 .then((res1) => {
                     let id = res1.data[res1.data.length - 1]._id;
                     console.log(id)
@@ -34,9 +34,8 @@ function onSubmit(e) {
 
 //fetch from storage and display
 window.addEventListener('DOMContentLoaded', () => {
-    axios.get("https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData")
-        .then((res) => {
-            //axios.delete('https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/63b479de32f90d03e8f0f9d3    ') 
+    axios.get(crudLink)
+        .then((res) => { 
             for (let i = 0; i < res.data.length; i++) {
                 let n = res.data[i].name;
                 let e = res.data[i].email;
@@ -72,7 +71,7 @@ function alterItem(e) {
     console.log(editId)
     if (e.target.classList.contains('btn-delete')) {
         console.log('delete', editId);
-        let link = 'https://crudcrud.com/api/e07f11eb4df74c589fae41633695886e/appointmentData/' + editId;
+        let link = crudLink +'/' + editId;
         axios.delete(link);
         e.target.parentNode.remove();
 
