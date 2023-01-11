@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Seller's Admin Page</title>
+    <style>
+        label {
+            font-weight: bold;
+        }
+
+        form {
+            border-style: solid;
+            border-color: rgb(136, 136, 136);
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="adminform" autocomplete="on" >
+        <label for="product">Product Name:</label>
+        <input type="text" id="product" placeholder="Product Name" required>
+        <label for="sp">Selling Price:</label>
+        <input type="number" id="sp" placeholder="Selling Price" required>
+        <label for="cat">Category:</label>
+        <select id="cat" >
+            <option value="misc" selected>Miscellaneous</option>
+            <option value="food">Grocery/Food</option>
+            <option value="skincare">Skin Care</option>
+            <option value="electronics">Electronics</option>
+        </select>
+        <input type="submit" value="Submit">
+    </form>
+    <hr>
+    <h1>Skin Care Items</h1>
+    <ul id="skincareitems">
+
+    </ul>
+
+    <h1>Electronic Items</h1>
+    <ul id="electronicitems">
+
+    </ul>
+
+    <h1>Grocery/Food Items</h1>
+    <ul id="fooditems">
+
+    </ul>
+    <h1>Miscellaneous</h1>
+    <ul id="miscitems">
+
+    </ul>
+<script src="main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+</body>
+
+</html>
