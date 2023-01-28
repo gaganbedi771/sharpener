@@ -16,7 +16,6 @@ function onSubmit(e) {
             document.getElementById('h1').innerHTML='Add User'; 
             document.getElementById('submitbtn').value='Submit'; 
             ParentNode.remove();
-
             let li = document.createElement('li');
             li.className = 'item';
             li.id = idForUpdate;
@@ -28,8 +27,6 @@ function onSubmit(e) {
             emailInput.value = '';
             console.log('updated')
         })
-
-        console.log('Running')
     }
     else{
     axios.post(crudLink, { name: nameInput.value, email: emailInput.value })
@@ -37,9 +34,7 @@ function onSubmit(e) {
             console.log(res);
             axios.get(crudLink)
                 .then((res1) => {
-                    let id = res1.data[res1.data.length - 1]._id;
-                    console.log(id)
-                    //get all registered users and add to li elements    
+                    let id = res1.data[res1.data.length - 1]._id;   
                     let li = document.createElement('li');
                     li.className = 'item';
                     li.id = id;
@@ -52,11 +47,7 @@ function onSubmit(e) {
                 })
         })
         .catch(err => console.log(err))
-
-
     }
-    
-
 }
 
 //fetch from storage and display

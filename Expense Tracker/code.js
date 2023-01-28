@@ -5,8 +5,6 @@ for(let k of Object.keys(localStorage)){
     let amt=obj.Amt;
     let des=obj.Des;
     let cat=obj.Cat;
-    //console.log(amt,des,cat);
-
     makeLiItems(amt,des,cat);
 }
 
@@ -31,7 +29,6 @@ function appendButtonToLi(li){
     btnEdit.appendChild(document.createTextNode('Edit'));
     li.append(btnEdit);
     li.append(btnDel);
-
 }
 
 function fun(e) {

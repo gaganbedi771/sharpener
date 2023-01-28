@@ -48,3 +48,28 @@ const u2=new User('bedi','@hotmail.com','phisss');
 console.log(`${User.count()} is the total users registered`);
 console.log(u1.renewMembership(1,'M'));
 console.log(u2.renewMembership(1,'Y'));
+
+
+async function fun1(){
+  console.log('a');
+  console.log('b');
+  await new Promise ((res,rej)=>{
+    setTimeout(()=>{
+      console.log('c')
+      res();
+    },3000);
+  })
+  
+  await new Promise ((res,rej)=>{
+    setTimeout(()=>{
+      console.log('d');
+      res();
+    },0);
+  })
+  console.log('e');
+}
+
+
+fun1()
+
+

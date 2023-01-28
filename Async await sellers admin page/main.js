@@ -1,5 +1,5 @@
 let form = document.getElementById('adminform');
-let link = 'https://crudcrud.com/api/e06e5645d0e24c37afe21ecf16d43ca1/adminData';
+let link = 'https://crudcrud.com/api/4e71eca1fb394f1dbf6ec364cb3f73bb/adminData';
 form.addEventListener('submit', onSubmit);
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -56,6 +56,7 @@ function delButton() {
     btnDel.className = 'btn-del';
     btnDel.appendChild(document.createTextNode('Delete'));
     return btnDel;
+
 }
 
 function appendToSection(category, ele) {
