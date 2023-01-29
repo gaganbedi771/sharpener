@@ -44,6 +44,9 @@ const server = http.createServer(function (req, res) {
             const parsedbody = Buffer.concat(body).toString();
             const message = parsedbody.split('=')[1];
             fs.writeFile("message.txt", message, (err) => {
+                if(err){
+                    console.log(err);
+                }
                 res.statusCode = 302; //302==redirection
                 res.setHeader('Location', '/home')
                 return res.end();
