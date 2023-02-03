@@ -29,7 +29,12 @@ router.use("/chatroom", (req, res, next) => {
 router.post("/msgRec", (req, res, next) => {
     if (req.body["username"]) {
         let str = req.body["username"] + ': ' + req.body["message"] + "\n";
-        fs.appendFile('messages.txt', str, (err) => { console.log(err) });
+        fs.appendFile('messages.txt', str,(err)=>{
+            if(err){
+                console.log(err);
+                return;
+            }
+        });
         res.redirect("/chatroom")
     }
     else {
