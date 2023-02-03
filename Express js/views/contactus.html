@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register here</title>
+    <style>
+        body{
+            background-image: url(https://img.freepik.com/premium-photo/retro-red-telephone-background_488220-16432.jpg?w=740);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            
+        }
+        h2 {
+            font-size: 40px;
+            text-align: center;
+        }
+        p {
+            font-size: 30px;
+            text-align: center;
+        }
+        form {
+            background-color: rgb(220, 236, 238);
+            font-size: 25px;
+            text-align:left ;
+            margin-left: 250px;
+            margin-right: 250px;
+            border: 5px solid rgb(220, 236, 238);
+        }
+        input {
+            width: 99%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="main-header">
+        <nav class="main-header_nav">
+            <ul class="main-header_item-list">
+                <li class="main-header_item"><a href="/">Shop</a></li>
+                <li class="main-header_item"><a href="/admin/add-product">Add Product</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+<h2>Book a call</h2>
+<p>Fill your details and our representative will cal you shortly.</p>
+<hr><br>
+<form action="#" onsubmit="submitButton(event)">
+    <label for="name">Name:</label> <br>
+    <input type="text" id="name" name="name" placeholder="Enter your Name" autocomplete="on" > <br>
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" placeholder="Enter your Email" autocomplete="on" required><br>
+    <label for="phn">Phone Number</label><br>
+    <input type="tel" id="phn" name="phn" placeholder="Enter your Phone Number" autocomplete="on" > <br>
+    <label for="time">Time for call:</label> <br>
+    <input type="datetime-local" id="time" name="time" placeholder="Enter time for call"> <br>
+    <button>Submit</button>
+
+</form>
+
+<script>
+    function submitButton(event){
+        event.preventDefault();
+        //let n=document.getElementById("email").value;
+        console.log(event.target.email.value);
+        //console.log(n);
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+<html>
+
+<head>
+    <title>User Details</title>
+</head>
+
+<body>
+    <h1>Enter Username</h1>
+    <form action="/chatroom" method="POST" onsubmit='localStorage.setItem("username", document.getElementById("username").value)'>
+        <input type="text" id="username" name="username" placeholder="Enter Username" required>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+
+</html>
