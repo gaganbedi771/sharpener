@@ -2,13 +2,8 @@ const express=require('express');
 const router=express.Router();
 const rootDir=require('../util/path');
 const path=require('path');
+const productsController=require("../controllers/products");
 
-
-router.get("/",(req,res,next)=>{
-    //console.log("In middleware again");
-    res.sendFile(path.join(rootDir,'views','shop.html'))
-    //res.send('<h1>Main Page</h1>');
-    //res.send( { key1: 'value' });
-})
+router.get("/",productsController.getProducts);
 
 module.exports=router;
