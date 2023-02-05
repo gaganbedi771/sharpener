@@ -1,4 +1,5 @@
 const path=require("path");
+const Products=require("../models/product");
 
 exports.getAddProduct= (req,res,next)=>{
     //console.log("In middleware");
@@ -9,19 +10,19 @@ exports.getAddProduct= (req,res,next)=>{
 }
 
 exports.postAddProduct=(req,res,next)=>{
-    console.log(req.body);
+    const product=new Products (req.body.productname,req.body.quantity);
+    product.save();
     res.redirect("/");
 }
 
 exports.getProducts=(req,res,next)=>{
     //console.log("In middleware again");
-    res.sendFile(path.join(__dirname,'..','views','shop.html'))
+    Products.fetchAll((proList)=>{
+        console.log(proList);
+        res.sendFile(path.join(__dirname,'..','views','shop.html'))
+    });
+    
     //res.send('<h1>Main Page</h1>');
     //res.send( { key1: 'value' });
 }
 
-exports.errorPage=(req,res,next)=>{
-    res.status(404);
-    res.sendFile(path.join(__dirname,'..','views','404.html'));
-    //res.send("<h1>Page Note Found</h1>");
-}

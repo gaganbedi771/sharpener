@@ -1,7 +1,7 @@
 const express=require("express");
 const router=express.Router();
-const productController=require("../controllers/products")
+const errorController=require("../controllers/error")
 
-router.use(productController.errorPage);
+router.use(errorController.errorPage);
 
 module.exports=router;
