@@ -1,8 +1,9 @@
-//Save details to local storage
+//using crud crud
+
 
 let form = document.getElementById('my-form');
 form.addEventListener('submit', onSubmit);
-let crudLink='https://crudcrud.com/api/63896662c41e447ba267b367901ffab9/appointmentData';
+let crudLink='https://crudcrud.com/api/70f89c5215cc4d968931eb011548eaa4/data'
 let idForUpdate;
 let ParentNode;
 function onSubmit(e) {
@@ -10,7 +11,6 @@ function onSubmit(e) {
     let nameInput = document.getElementById('name');
     let emailInput = document.getElementById('email');
     if(document.getElementById('submitbtn').value=='Update'){
-        console.log(crudLink+'/'+idForUpdate)
         axios.put(crudLink+'/'+idForUpdate,{name : nameInput.value, email: emailInput.value})
         .then((res)=>{
             document.getElementById('h1').innerHTML='Add User'; 
@@ -31,7 +31,6 @@ function onSubmit(e) {
     else{
     axios.post(crudLink, { name: nameInput.value, email: emailInput.value })
         .then((res) => {
-            console.log(res);
             axios.get(crudLink)
                 .then((res1) => {
                     let id = res1.data[res1.data.length - 1]._id;   
@@ -87,7 +86,6 @@ function alterItem(e) {
     e.preventDefault();
     let editId = e.target.parentNode.id;
     let link = crudLink +'/' + editId;
-    console.log(editId)
     if (e.target.classList.contains('btn-delete')) {
         console.log('delete', editId);
         axios.delete(link);
@@ -95,7 +93,6 @@ function alterItem(e) {
 
     }
     else if (e.target.classList.contains('btn-edit')) {
-        console.log('edit pressed');
         axios.get(link)
         .then((res)=>{
             document.getElementById('name').value=res.data.name;
