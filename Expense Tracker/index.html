@@ -1,50 +1,187 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Expense Tracker</title>
-  </head>
-  <body>
-    <h1 class="text-center"><span class="badge badge-secondary" >Expense Tracker</span></h1>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <title>Expense Tracker</title>
+</head>
+
+<body>
+  <h1 class="text-center"><span class="badge badge-secondary">Expense Tracker</span></h1>
+  <br>
+  <form id="my-form" class="text-center px-5 py-0">
+    <div class="form-group">
+      <label for="expense">Expenditure Amount</label>
+      <input type="number" class="form-control" id="amount" placeholder="Enter Amount in Rupees" required>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <input type="text" class="form-control" id="description" placeholder="Enter Description" required>
+    </div>
+    <input type="hidden" value="" id="userId">
+
+    <label for="category">Category</label>
+    <div class="input-group">
+      <select class="custom-select" id="category" required>
+        <option selected>Miscellaneous</option>
+        <option>Fuel</option>
+        <option>Food</option>
+        <option>Grooming</option>
+      </select>
+    </div>
     <br>
-    <form id="my-form" class="text-center px-5 py-0">
-        <div class="form-group">
-          <label for="expense">Expenditure Amount</label>
-          <input type="number" class="form-control" id="expense" placeholder="Enter Amount in Rupees" required>
-        </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <input type="text" class="form-control" id="description" placeholder="Enter Description" required>
-        </div>
+    <input type="submit" class="btn btn-primary" id="submitbtn" value="Submit">
+  </form>
 
-        <label for="category">Category</label>
-        <div class="input-group">
-            <select class="custom-select" id="selectcategory" required >
-              <option selected>Miscellaneous</option>
-              <option>Fuel</option>
-              <option>Food</option>
-              <option>Grooming</option>
-            </select>
-          </div>
-          <br>
-        <button type="submit" class="btn btn-primary" id="submitbtn">Submit</button>
-    </form>
+  <h3 class="text-left px-5 py-0"><span class="badge badge-secondary">Added Expenses</span></h3>
+  <ul class="list-group" id="listitems">
 
-    <h3 class="text-left px-5 py-0"><span class="badge badge-secondary" >Added Expenses</span></h3>
-    <ul class="list-group" id="listitems">
+  </ul>
 
-    </ul>
-    
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="code.js"></script>
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+
+    window.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM LOADED");
+      axios.get("http://localhost:1000/getAll")
+        .then((allData) => {
+          console.log(allData);
+
+          allData.data.forEach((data) => {
+            console.log("single");
+            console.log(data);
+            appendDataToPage(data);
+          })
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    })
+
+
+    document.getElementById("listitems").addEventListener("click", onClick);
+
+    function onClick(e) {
+      e.preventDefault();
+      const id = e.target.parentNode.id;
+      if (e.target.className == "btn-delete") {
+
+        console.log("delets", id)
+        axios.delete(`http://localhost:1000/deleteExpense/${id}`)
+          .then(result => {
+            e.target.parentNode.remove();
+          })
+          .catch(err => {
+            console.log(err);
+          })
+      }
+
+      else if (e.target.className == "btn-edit") {
+        console.log("edit")
+
+        axios.get(`http://localhost:1000/getDetail/${id}`)
+          .then(result => {
+
+            //console.log(result.data.category);
+            document.getElementById("userId").value = result.data.id;
+            document.getElementById("amount").value = result.data.amount;
+            document.getElementById("description").value = result.data.description;
+            document.getElementById("category").value = result.data.category;
+            document.getElementById("submitbtn").value = "Update";
+
+
+          })
+
+
+      }
+
+    }
+
+    document.getElementById("my-form").addEventListener("submit", onSubmit);
+
+    function onSubmit(e) {
+      e.preventDefault();
+
+      const category = document.getElementById("category").value;
+      const description = document.getElementById("description").value;
+      const amount = document.getElementById("amount").value;
+
+      if (document.getElementById("submitbtn").value == "Update") {
+        console.log("Update")
+        const id = document.getElementById("userId").value;
+        axios.patch(`http://localhost:1000/updateDetails/${id}`, {
+          category: category,
+          description: description,
+          amount: amount
+        })
+        .then(result=>{
+          console.log(result);
+          document.getElementById(id).remove();
+          appendDataToPage(result.data);
+        })
+        .catch(err=>{
+          console.log(err);
+        })
+      }
+
+      else {
+        axios.post("http://localhost:1000/add-expense", {
+          category: category,
+          description: description,
+          amount: amount
+        })
+          .then((result) => {
+            appendDataToPage(result.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+      }
+
+
+    }
+
+    function appendDataToPage(data) {
+      const id = data.id;
+      const category = data.category;
+      const expense = data.amount;
+      const description = data.description;
+
+      let li = document.createElement('li');
+      li.id = id;
+      li.appendChild(document.createTextNode(`Rs  ${expense} spent for ${description} [${category}]`));
+
+      let btnDel = document.createElement('button');
+      let btnEdit = document.createElement('button');
+      btnDel.className = 'btn-delete';
+      btnEdit.className = 'btn-edit';
+      btnEdit.appendChild(document.createTextNode('Edit'));
+      btnDel.appendChild(document.createTextNode('Delete'));
+      li.append(btnEdit);
+      li.append(btnDel);
+
+      document.getElementById("listitems").appendChild(li);
+    }
+
+  </script>
 </body>
+
 </html>
