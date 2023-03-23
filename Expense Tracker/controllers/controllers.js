@@ -2,14 +2,12 @@ const Expense = require("../models/expenseModel");
 
 
 exports.addExpense = (req, res, next) => {
-    console.log(req.body.category);
-    console.log(req.body.description);
-    console.log(req.body.amount);
+
     const category = req.body.category
     const description = req.body.description
     const amount = req.body.amount
 
-    if(!category || !description || !amount){
+    if (!category || !description || !amount) {
         throw new Error("All fields are necessary");
     }
 
@@ -19,34 +17,49 @@ exports.addExpense = (req, res, next) => {
         description: description
     })
         .then((result) => {
-            res.status(200).json(result);
+            res.status(201).json(result);
         })
         .catch(err => {
             console.log(err);
+            res.status(500).json(err);
         })
-
 }
 
 exports.getAll = (req, res, next) => {
+
     Expense.findAll()
         .then((data) => {
             res.status(201).json(data);
         })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        })
 }
 
 exports.deleteExpense = (req, res, next) => {
-
+    try{
     const id = req.params.id
     Expense.destroy({ where: { id: id } });
-    res.sendStatus(200);
+    res.sendStatus(201);
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json(err);
+    }
 }
 
 exports.getDetail = (req, res, next) => {
+
     const id = req.params.id;
 
     Expense.findByPk(id)
         .then(result => {
             res.status(201).json(result);
+        })
+        .catch(err=>{
+            console.log(err);
+            res.status(500).json(err);
         })
 }
 
@@ -56,7 +69,7 @@ exports.updateDetails = (req, res, next) => {
     const description = req.body.description
     const amount = req.body.amount
 
-    if(!category || !description || !amount){
+    if (!category || !description || !amount) {
         throw new Error("All fields are necessary");
     }
 
@@ -66,11 +79,10 @@ exports.updateDetails = (req, res, next) => {
             result.description = description
             result.amount = amount
             await result.save();
-            res.status(200).json(result);
-
-
+            res.status(201).json(result);
         })
-        .catch(err=>{
+        .catch(err => {
             console.log(err);
+            res.status(500).json(err);
         })
 }
