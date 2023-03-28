@@ -60,6 +60,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="app.js"></script>
+  
   <script>
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -133,7 +134,7 @@
       }
 
       else {
-        axios.post("http://localhost:1000/fdsadd-expense", {
+        axios.post("http://localhost:1000/add-expense", {
           category: category,
           description: description,
           amount: amount
