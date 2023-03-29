@@ -17,41 +17,148 @@
 </head>
 
 <body>
-    <form id="adminform" autocomplete="on" >
+    <form id="adminform" autocomplete="on">
         <label for="product">Product Name:</label>
         <input type="text" id="product" placeholder="Product Name" required>
         <label for="sp">Selling Price:</label>
         <input type="number" id="sp" placeholder="Selling Price" required>
         <label for="cat">Category:</label>
-        <select id="cat" >
+        <select id="cat" required>
             <option value="misc" selected>Miscellaneous</option>
             <option value="food">Grocery/Food</option>
             <option value="skincare">Skin Care</option>
             <option value="electronics">Electronics</option>
         </select>
         <input type="submit" value="Submit">
+        <input type="hidden" value="">
     </form>
     <hr>
-    <h1>Skin Care Items</h1>
-    <ul id="skincareitems" class="">
+    <h2>Total Worth of Products:</h2>
+    <input type="number" id="total" value=0 readonly>
+    <hr>
+    <div id="items">
 
-    </ul>
+        <h2>Skin Care Items</h2>
+        <ul id="skincareitems">
 
-    <h1>Electronic Items</h1>
-    <ul id="electronicitems">
+        </ul>
 
-    </ul>
+        <h2>Electronic Items</h2>
+        <ul id="electronicitems">
 
-    <h1>Grocery/Food Items</h1>
-    <ul id="fooditems">
+        </ul>
 
-    </ul>
-    <h1>Miscellaneous</h1>
-    <ul id="miscitems">
+        <h2>Grocery/Food Items</h2>
+        <ul id="fooditems">
 
-    </ul>
-<script src="main.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+        </ul>
+        <h2>Miscellaneous</h2>
+        <ul id="miscitems">
+
+        </ul>
+    </div>
+    <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+
+        document.getElementById("adminform").addEventListener("submit", onSubmit);
+        document.getElementById("items").addEventListener("click", onDel);
+
+        window.addEventListener("DOMContentLoaded", () => {
+            axios.get("http://localhost:5000/getAll")
+                .then((allData) => {
+                    allData.data.forEach((data) => {
+                        appendToPage(data);
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+        })
+
+        function onSubmit(e) {
+            e.preventDefault();
+            const product = document.getElementById("product").value;
+            const sp = document.getElementById("sp").value;
+            const cat = document.getElementById("cat").value;
+
+            axios.post("http://localhost:5000/submit", {
+                name: product,
+                price: sp,
+                category: cat
+            })
+                .then(result => {
+                    appendToPage(result.data);
+                    document.getElementById("product").value = ""
+                    document.getElementById("sp").value = ""
+                    document.getElementById("cat").value = ""
+                })
+                .catch(err => console.log(err));
+        }
+
+        function appendToPage(data) {
+
+            const id = data.id;
+            const product = data.name;
+            const price = data.price;
+            const category = data.category;
+            const previousTotal = Number(document.getElementById("total").value);
+
+            let li = document.createElement('li');
+            li.id = id;
+            li.appendChild(document.createTextNode(`${product} is selling at ${price}`));
+
+            let btnDel = document.createElement('button');
+            btnDel.className = 'btn-del';
+            btnDel.appendChild(document.createTextNode('Delete'));
+
+            li.append(btnDel);
+
+            switch (category) {
+                case 'misc':
+                    document.getElementById('miscitems').appendChild(li);
+                    break;
+                case "food":
+                    document.getElementById('fooditems').appendChild(li);
+                    break;
+                case "skincare":
+                    document.getElementById('skincareitems').appendChild(li);
+                    break;
+                case "electronics":
+                    document.getElementById('electronicitems').appendChild(li);
+                    break;
+            }
+
+            const newTotal=previousTotal+Number(price);
+            document.getElementById("total").value = newTotal;
+        }
+
+        function onDel(e) {
+            if (e.target.classList.contains("btn-del")) {
+                const id = e.target.parentNode.id;
+                const previousTotal = Number(document.getElementById("total").value);
+                let productValueToDel=0;
+
+                axios.get(`http://localhost:5000/getProduct/${id}`)
+                .then(result=>{
+                    //console.log(result.data.price)
+                    productValueToDel=Number(result.data.price);
+                })
+                .catch(err=>console.log(err));
+
+
+                axios.delete(`http://localhost:5000/delete/${id}`)
+                    .then(result => {
+                        document.getElementById("total").value = previousTotal-productValueToDel;
+                        e.target.parentNode.remove();
+                    })
+                    .catch(err => console.log(err));
+            }
+        }
+
+    </script>
 </body>
 
 </html>

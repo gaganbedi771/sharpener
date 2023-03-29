@@ -1,6 +1,18 @@
 const Expense = require("../models/expenseModel");
 
 
+exports.getAll = (req, res, next) => {
+
+    Expense.findAll()
+        .then((data) => {
+            res.status(201).json(data);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        })
+}
+
 exports.addExpense = (req, res, next) => {
 
     const category = req.body.category
@@ -25,28 +37,17 @@ exports.addExpense = (req, res, next) => {
         })
 }
 
-exports.getAll = (req, res, next) => {
-
-    Expense.findAll()
-        .then((data) => {
-            res.status(201).json(data);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        })
-}
-
 exports.deleteExpense = (req, res, next) => {
-    try{
+    
     const id = req.params.id
-    Expense.destroy({ where: { id: id } });
-    res.sendStatus(201);
-    }
-    catch(err){
+    Expense.destroy({ where: { id: id } })
+    .then(result=>{
+        res.sendStatus(201);
+    })
+    .catch(err=>{
         console.log(err);
         res.status(500).json(err);
-    }
+    })
 }
 
 exports.getDetail = (req, res, next) => {
