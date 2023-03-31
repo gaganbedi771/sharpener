@@ -1,5 +1,40 @@
 const Expense = require("../models/expenseModel");
+const User = require("../models/users");
 
+exports.signUp = (req, res, next) => {
+
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+
+    async function ifExists() {
+        const alreadyExists = await User.findAll({ where: { email: email } });
+        if (alreadyExists.length>0) {
+            // console.log(alreadyExists)
+            res.status(201).json({ existed: true });
+        }
+        else {
+            User.create({
+                name: name,
+                email: email,
+                password: password
+            })
+                .then(result => {
+                    res.sendStatus(201);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.sendStatus(500)
+
+                })
+
+        }
+    }
+
+    ifExists();
+
+
+}
 
 exports.getAll = (req, res, next) => {
 
@@ -38,16 +73,16 @@ exports.addExpense = (req, res, next) => {
 }
 
 exports.deleteExpense = (req, res, next) => {
-    
+
     const id = req.params.id
     Expense.destroy({ where: { id: id } })
-    .then(result=>{
-        res.sendStatus(201);
-    })
-    .catch(err=>{
-        console.log(err);
-        res.status(500).json(err);
-    })
+        .then(result => {
+            res.sendStatus(201);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        })
 }
 
 exports.getDetail = (req, res, next) => {
@@ -58,7 +93,7 @@ exports.getDetail = (req, res, next) => {
         .then(result => {
             res.status(201).json(result);
         })
-        .catch(err=>{
+        .catch(err => {
             console.log(err);
             res.status(500).json(err);
         })
@@ -87,3 +122,4 @@ exports.updateDetails = (req, res, next) => {
             res.status(500).json(err);
         })
 }
+
