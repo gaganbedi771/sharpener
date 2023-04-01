@@ -7,11 +7,17 @@ exports.signUp = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
+    if (!name || !email || !password) {
+        return res.status(400).json({ customMessage: "Bad parameters" });
+
+    }
+
+    ifExists();
+
     async function ifExists() {
         const alreadyExists = await User.findAll({ where: { email: email } });
-        if (alreadyExists.length>0) {
-            // console.log(alreadyExists)
-            res.status(201).json({ existed: true });
+        if (alreadyExists.length > 0) {
+            return res.status(500).json({ customMessage: "User Already exists" });
         }
         else {
             User.create({
@@ -20,20 +26,42 @@ exports.signUp = (req, res, next) => {
                 password: password
             })
                 .then(result => {
-                    res.sendStatus(201);
+                    return res.sendStatus(201);
                 })
                 .catch((err) => {
                     console.log(err);
-                    res.sendStatus(500)
-
+                    return res.sendStatus(500)
                 })
-
         }
     }
+}
 
-    ifExists();
+exports.signIn=async (req,res,next)=>{
+    const email=req.body.email;
+    const password=req.body.password;
+    if ( !email || !password) {
+        return res.status(400).json({ customMessage: "Bad parameters" });
 
+    }
 
+    try{    
+        const emailExists=await User.findAll({where:{email:email}}) 
+        if(emailExists.length==0){
+            return res.status(404).json({ customMessage: "User not found, SignUp" });
+        }
+        else if(password!==emailExists[0].password){
+            return res.status(401).json({ customMessage: "User not authorized" });
+        }
+        else{
+            return res.status(201).json({ customMessage: "Success" });
+        }
+
+    }
+    catch(err){
+        return res.status(500).json(err);
+    }
+
+    console.log(emailExists[0].password);
 }
 
 exports.getAll = (req, res, next) => {
