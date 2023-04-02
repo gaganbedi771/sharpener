@@ -8,7 +8,8 @@ function onSignin(e) {
         password: password
     })
         .then(result => {
-            document.body.innerHTML += `<div style="color:red"> ${result.data.customMessage}</div>`
+             document.body.innerHTML += `<div style="color:red"> ${result.data.customMessage}</div>` 
+            window.location.href="index.html"
         })
         .catch(err => {
             
