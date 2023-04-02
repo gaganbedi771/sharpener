@@ -1,7 +1,8 @@
 const Expense = require("../models/expenseModel");
 const User = require("../models/users");
+const bcrypt = require("bcrypt");
 
-exports.signUp = (req, res, next) => {
+exports.signUp = async (req, res, next) => {
 
     const name = req.body.name;
     const email = req.body.email;
@@ -9,59 +10,75 @@ exports.signUp = (req, res, next) => {
 
     if (!name || !email || !password) {
         return res.status(400).json({ customMessage: "Bad parameters" });
-
     }
 
-    ifExists();
+    const alreadyExists = await User.findAll({ where: { email: email } });
 
-    async function ifExists() {
-        const alreadyExists = await User.findAll({ where: { email: email } });
-        if (alreadyExists.length > 0) {
-            return res.status(500).json({ customMessage: "User Already exists" });
+    if (alreadyExists.length > 0) {
+        return res.status(500).json({ customMessage: "User Already exists" });
+    }
+
+    bcrypt.hash(password,10,(err,hashPassword)=>{
+        if(err){
+            console.log(err);
+                return res.sendStatus(500)
         }
-        else {
-            User.create({
-                name: name,
-                email: email,
-                password: password
+
+        User.create({
+            name: name,
+            email: email,
+            password: hashPassword
+        })
+            .then(result => {
+                return res.sendStatus(201);
             })
-                .then(result => {
-                    return res.sendStatus(201);
-                })
-                .catch((err) => {
-                    console.log(err);
-                    return res.sendStatus(500)
-                })
-        }
-    }
+            .catch((err) => {
+                console.log(err);
+                return res.sendStatus(500)
+            })
+    })
+    
 }
 
-exports.signIn=async (req,res,next)=>{
-    const email=req.body.email;
-    const password=req.body.password;
-    if ( !email || !password) {
+exports.signIn = async (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    if (!email || !password) {
         return res.status(400).json({ customMessage: "Bad parameters" });
 
     }
 
-    try{    
-        const emailExists=await User.findAll({where:{email:email}}) 
-        if(emailExists.length==0){
+    try {
+        const emailExists = await User.findAll({ where: { email: email } })
+        if (emailExists.length == 0) {
             return res.status(404).json({ customMessage: "User not found, SignUp" });
         }
-        else if(password!==emailExists[0].password){
-            return res.status(401).json({ customMessage: "User not authorized" });
-        }
-        else{
-            return res.status(201).json({ customMessage: "Success" });
-        }
+        // else if (password !== emailExists[0].password) {
+        //     return res.status(401).json({ customMessage: "User not authorized" });
+        // }
+        // else {
+        //     return res.status(201).json({ customMessage: "Success" });
+        // }
+       
+        bcrypt.compare(password,emailExists[0].password,(error,response)=>{
+            if(error){
+                console.log(err);
+                return res.sendStatus(500)
+            }
+            if(response){
+                return res.status(201).json({ customMessage: "Success" });
+            }
+            else if(!response){
+                return res.status(401).json({ customMessage: "User not authorized" });
+            }
+            
+        })
 
     }
-    catch(err){
+    catch (err) {
         return res.status(500).json(err);
     }
 
-    console.log(emailExists[0].password);
 }
 
 exports.getAll = (req, res, next) => {
