@@ -1,6 +1,9 @@
-const Expense = require("../models/expenseModel");
+const Expense = require("../models/expense");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+
 
 exports.signUp = async (req, res, next) => {
 
@@ -18,10 +21,10 @@ exports.signUp = async (req, res, next) => {
         return res.status(500).json({ customMessage: "User Already exists" });
     }
 
-    bcrypt.hash(password,10,(err,hashPassword)=>{
-        if(err){
+    bcrypt.hash(password, 10, (err, hashPassword) => {
+        if (err) {
             console.log(err);
-                return res.sendStatus(500)
+            return res.sendStatus(500)
         }
 
         User.create({
@@ -37,7 +40,11 @@ exports.signUp = async (req, res, next) => {
                 return res.sendStatus(500)
             })
     })
-    
+
+}
+
+function generateAccessToken(id,name) {
+    return jwt.sign({ userId: id, name:name }, "secretkey");
 }
 
 exports.signIn = async (req, res, next) => {
@@ -45,7 +52,6 @@ exports.signIn = async (req, res, next) => {
     const password = req.body.password;
     if (!email || !password) {
         return res.status(400).json({ customMessage: "Bad parameters" });
-
     }
 
     try {
@@ -53,25 +59,19 @@ exports.signIn = async (req, res, next) => {
         if (emailExists.length == 0) {
             return res.status(404).json({ customMessage: "User not found, SignUp" });
         }
-        // else if (password !== emailExists[0].password) {
-        //     return res.status(401).json({ customMessage: "User not authorized" });
-        // }
-        // else {
-        //     return res.status(201).json({ customMessage: "Success" });
-        // }
-       
-        bcrypt.compare(password,emailExists[0].password,(error,response)=>{
-            if(error){
+
+        bcrypt.compare(password, emailExists[0].password, (error, response) => {
+            if (error) {
                 console.log(err);
                 return res.sendStatus(500)
             }
-            if(response){
-                return res.status(201).json({ customMessage: "Success" });
+            if (response) {
+                return res.status(201).json({ customMessage: "Success", token: generateAccessToken(emailExists[0].id, emailExists[0].name) });
             }
-            else if(!response){
+            else if (!response) {
                 return res.status(401).json({ customMessage: "User not authorized" });
             }
-            
+
         })
 
     }
@@ -83,8 +83,9 @@ exports.signIn = async (req, res, next) => {
 
 exports.getAll = (req, res, next) => {
 
-    Expense.findAll()
+    Expense.findAll({where:{userId:req.user.userId}})
         .then((data) => {
+            //console.log(req.user)
             res.status(201).json(data);
         })
         .catch(err => {
@@ -102,12 +103,14 @@ exports.addExpense = (req, res, next) => {
     if (!category || !description || !amount) {
         throw new Error("All fields are necessary");
     }
-
-    Expense.create({
-        category: category,
-        amount: amount,
-        description: description
-    })
+     
+        Expense.create
+        ({
+            category: category,
+            amount: amount,
+            description: description,
+            userId: req.user.userId
+        })
         .then((result) => {
             res.status(201).json(result);
         })
