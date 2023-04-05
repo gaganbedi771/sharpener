@@ -3,7 +3,7 @@ function onSignup(e) {
     const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
-
+console.log("running")
     axios.post("http://localhost:1000/signup", {
         name: name,
         email: email,
