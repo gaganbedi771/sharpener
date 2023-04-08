@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+const { where, STRING } = require("sequelize");
 const Expense = require("../models/expense");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
@@ -46,8 +46,8 @@ exports.signUp = async (req, res, next) => {
 
 }
 
-function generateAccessToken(id, name) {
-    return jwt.sign({ id: id, name: name }, "secretkey");
+function generateAccessToken(id, name, premium) {
+    return jwt.sign({ id: id, name: name, premium: premium }, process.env.SECRET_KEY);
 }
 
 exports.signIn = async (req, res, next) => {
@@ -69,7 +69,7 @@ exports.signIn = async (req, res, next) => {
                 return res.sendStatus(500)
             }
             if (response) {
-                return res.status(201).json({ customMessage: "Success", token: generateAccessToken(emailExists[0].id, emailExists[0].name) });
+                return res.status(201).json({ customMessage: "Success", token: generateAccessToken(emailExists[0].id, emailExists[0].name, emailExists[0].premium) });
             }
             else if (!response) {
                 return res.status(401).json({ customMessage: "User not authorized" });
@@ -202,70 +202,92 @@ exports.buyPremium = (req, res, next) => {
     })
 }
 
-exports.updatePremium = (req, res, next) => {
+exports.updatePremium = async (req, res, next) => {
+
+    const id = req.user.dataValues.id;
+    const name = req.user.dataValues.name;
+
+    const order = await Order.findOne({ where: { orderid: req.body.order_id } });
+
+    const p1 = new Promise((resolve, reject) => {
+        resolve(order.update({ paymentid: req.body.payment_id, status: "Success" }))
+    })
+    const p2 = new Promise((resolve, reject) => {
+        resolve(req.user.update({ premium: "yes" }))
+    })
+
+    Promise.all([p1, p2])
+        .then(() => {
+            res.status(201).json({ message: "Tables Updated", token: generateAccessToken(id, name, "yes") })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ err: err });
+        })
+}
+
+exports.updateFailure = (req, res, next) => {
 
     Order.findOne({ where: { orderid: req.body.order_id } })
         .then(order => {
-            order.update({ paymentid: req.body.payment_id, status: "Success" })
+            order.update({ status: "failed" })
                 .then(() => {
+                    res.status(201).json({ message: "Table updated" });
                 })
                 .catch(err => {
                     console.log(err)
-                    res.status(500).json({ err: err });
+                    res.status(500).json(err);
                 })
         })
         .catch(err => {
-            console.log(err)
-            res.status(500).json({ err: err })
-            return
-        })
-
-    User.findByPk(req.user.dataValues.id)
-        .then(user => {
-            user.update({ premium: "yes" })
-                .then(() => {
-                    res.status(201).json({ message: "Tables Updated" })
-                })
-                .catch(err => {
-                    console.log(err)
-                    res.status(500).json({ err: err })
-                })
-
-        })
-        .catch(err => {
-            console.log(err)
+            console.log(err);
             res.status(500).json({ err: err })
         })
 }
 
-exports.updateFailure=(req,res,next)=>{
-    
-    Order.findOne({where:{orderid:req.body.order_id}})
-    .then(order=>{
-        order.update({status:"failed"})
-        .then(()=>{
-            res.status(201).json({message:"Table updated"});
-        })
-        .catch(err=>{
-            console.log(err)
-            res.status(500).json(err);
-        })
-    })
-    .catch(err=>{
-        console.log(err);
-        res.status(500).json({err:err})
-    })
-}
+exports.checkPremium = (req, res, next) => {
 
-exports.checkPremium=(req,res,next)=>{
-    
-    const userId=req.user.dataValues.id;
+    const userId = req.user.dataValues.id;
     User.findByPk(userId)
-    .then(user=>{
-        res.status(201).json({message:user.dataValues.premium});
-    })
-    .catch(err=>{
+        .then(user => {
+            res.status(201).json({ message: user.dataValues.premium });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ message: "cannot fetch premium details" });
+        })
+}
+
+exports.showLeaderBoard = async (req, res, next) => {
+    try {
+        let ldrBoardData = {};
+
+        const expenses = await Expense.findAll();
+        expenses.forEach(expense => {
+            const identifier = expense.dataValues.userId;
+            if (ldrBoardData[identifier] == undefined) {
+                ldrBoardData[identifier] = expense.dataValues.amount;
+            }
+            else {
+                const preTotal = ldrBoardData[identifier]["total"];
+                ldrBoardData[identifier] = ldrBoardData[identifier] + expense.dataValues.amount;
+            }
+
+        })
+        console.log(ldrBoardData);
+
+        const ldrBoardDataArr=[];
+         const users=await User.findAll();
+         users.forEach(user=>{
+            ldrBoardDataArr.push({name:user.dataValues.name, total: ldrBoardData[user.dataValues.id]||0});
+         })
+        ldrBoardDataArr.sort((a,b)=>b["total"]-a["total"]);
+        res.status(201).json(ldrBoardDataArr);
+    }
+    catch (err) {
         console.log(err);
-        res.status(500).json({message:"cannot fetch premium details"});
-    })
+        res.status(500).json(err);
+    }
+
+
 }

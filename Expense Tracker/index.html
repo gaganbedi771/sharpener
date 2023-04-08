@@ -15,7 +15,8 @@
 
 <body>
   <h1 class="text-center"><span class="badge badge-secondary">Expense Tracker</span></h1>
-  <button id="premiumButton" class="btn btn-success btn-lg float-right">Buy premium</button>
+  <button id="premiumButton" class="btn btn-success btn-lg float-left">Buy premium</button>
+  <div id="ifPremium"></div>
   <br>
   <form id="my-form" class="text-center px-5 py-0">
     <div class="form-group">
@@ -42,10 +43,17 @@
   </form>
   <hr>
 
-  <h3 class="text-center px-5 py-0"><span class="badge badge-secondary">Added Expenses</span></h3>
+  <h3 class="text-center px-5 py-0  badge-secondary">Added Expenses</h3>
   <ul class="list-group text-center" id="listitems">
 
   </ul>
+
+  <div id="LeaderBoard" >
+
+    <ul class="list-group text-center" id="boardItems">
+
+    </ul>
+  </div>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

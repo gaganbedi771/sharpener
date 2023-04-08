@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const controllers = require("../controllers/controllers");
-const userAuthentication=require("../middleware/authenticate");
+const userAuthentication = require("../middleware/authenticate");
 
-router.get("/purchasePremium",userAuthentication,controllers.buyPremium);
-router.patch("/purchasePremium/success",userAuthentication,controllers.updatePremium);
-router.patch("/purchasePremium/failure",userAuthentication,controllers.updateFailure);
+router.get("/purchasePremium", userAuthentication, controllers.buyPremium);
+router.patch("/purchasePremium/success", userAuthentication, controllers.updatePremium);
+router.patch("/purchasePremium/failure", userAuthentication, controllers.updateFailure);
+router.get("/purchasePremium/showLeaderBoard", userAuthentication, controllers.showLeaderBoard);
 
 module.exports = router;

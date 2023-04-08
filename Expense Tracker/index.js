@@ -1,7 +1,18 @@
 
 const token = localStorage.getItem("token");
-window.addEventListener("DOMContentLoaded", () => {
 
+function premiumFeatures() {
+  document.getElementById("premiumButton").remove();
+  document.getElementById("ifPremium").innerHTML = "You are a premium user ";
+  const ldrBoard = document.createElement("button");
+  ldrBoard.className = "btn btn-success float-right";
+  ldrBoard.id="ldrBrdBtn";
+  ldrBoard.appendChild(document.createTextNode("LeaderBoard"));
+  document.getElementById("ifPremium").append(ldrBoard);
+  ldrBoard.addEventListener("click",showLdrBrd);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
 
   axios.get("http://localhost:1000/getAll", { headers: { "Authorization": token } })
     .then((allData) => {
@@ -13,12 +24,14 @@ window.addEventListener("DOMContentLoaded", () => {
       console.log(err);
     })
 
-    axios.get("http://localhost:1000/checkPremium", { headers: { "Authorization": token } })
+  axios.get("http://localhost:1000/checkPremium", { headers: { "Authorization": token } })
     .then(result => {
-        
-        if(result.data.message=="yes"){
-          document.getElementById()
-        }
+
+      if (result.data.message == "yes") {
+
+        premiumFeatures();
+
+      }
     })
     .catch(err => console.log(err))
 
@@ -28,6 +41,7 @@ window.addEventListener("DOMContentLoaded", () => {
 document.getElementById("my-form").addEventListener("submit", onSubmit);
 document.getElementById("listitems").addEventListener("click", onClick);
 document.getElementById("premiumButton").addEventListener("click", buyPre);
+
 
 function onClick(e) {
   e.preventDefault();
@@ -146,6 +160,7 @@ function buyPre(e) {
             .then((result) => {
               // console.log(result);
               alert("You are a premium user now")
+              premiumFeatures();
             })
             .catch(err => {
               console.log(err)
@@ -163,7 +178,6 @@ function buyPre(e) {
           order_id: options.order_id,
         }, { headers: { "Authorization": token } })
           .then((result) => {
-            // console.log(result);
             alert("Payment Failed Try again")
           })
           .catch(err => {
@@ -171,4 +185,20 @@ function buyPre(e) {
           })
       })
     })
+}
+
+function showLdrBrd(){
+  // console.log("ldrbrd")
+  
+  const p=document.createElement("h3");
+  p.className="text-center px-5 py-0 badge-secondary"
+  p.appendChild(document.createTextNode("Leaderboard"))
+  const LeaderBoard=document.getElementById("LeaderBoard");
+  const boardItems=document.getElementById("boardItems");
+  LeaderBoard.insertBefore(p,boardItems);
+  axios.get("http://localhost:1000/purchasePremium/showLeaderBoard",{headers:{"Authorization":token}})
+  .then(result=>{
+   //document.getElementById("LeaderBoard").appendChild("<h3>fyt</h3>")
+  })
+  console.log(result)
 }
