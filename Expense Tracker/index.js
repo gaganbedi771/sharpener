@@ -188,8 +188,7 @@ function buyPre(e) {
 }
 
 function showLdrBrd(){
-  // console.log("ldrbrd")
-  
+    
   const p=document.createElement("h3");
   p.className="text-center px-5 py-0 badge-secondary"
   p.appendChild(document.createTextNode("Leaderboard"))
@@ -198,7 +197,16 @@ function showLdrBrd(){
   LeaderBoard.insertBefore(p,boardItems);
   axios.get("http://localhost:1000/purchasePremium/showLeaderBoard",{headers:{"Authorization":token}})
   .then(result=>{
-   //document.getElementById("LeaderBoard").appendChild("<h3>fyt</h3>")
+   console.log(result.data)
+    result.data.forEach(data=>{
+      appendToLeaderBoard(data);
+    })
   })
-  console.log(result)
+}
+
+function appendToLeaderBoard(obj){
+  const li=document.createElement("li");
+  li.appendChild(document.createTextNode(`${obj.name} has spent ${obj.total}`));
+  document.getElementById("boardItems").appendChild(li);
+
 }

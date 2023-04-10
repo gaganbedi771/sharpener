@@ -9,6 +9,7 @@ const expenseRoutes = require("./routes/expense");
 const userRoutes = require("./routes/users");
 const premiumRoutes=require("./routes/premiumUser");
 const Order = require("./models/order");
+const findAll=require("./controllers/controllers");
 
 const error404 = require("./controllers/error");
 
@@ -27,6 +28,8 @@ User.hasMany(Expense);
 Expense.belongsTo(User);
 User.hasMany(Order);
 Order.belongsTo(User);
+
+// findAll.showLeaderBoard();
 
 sequelize.sync()
     // sequelize.sync({force:true})

@@ -1,10 +1,11 @@
-const { where, STRING } = require("sequelize");
+// const { where, STRING } = require("sequelize");
 const Expense = require("../models/expense");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Razorpay = require("razorpay");
 const Order = require("../models/order");
+const sequelize = require("../util/database");
 require('dotenv').config();
 
 
@@ -260,29 +261,68 @@ exports.checkPremium = (req, res, next) => {
 
 exports.showLeaderBoard = async (req, res, next) => {
     try {
-        let ldrBoardData = {};
 
-        const expenses = await Expense.findAll();
-        expenses.forEach(expense => {
-            const identifier = expense.dataValues.userId;
-            if (ldrBoardData[identifier] == undefined) {
-                ldrBoardData[identifier] = expense.dataValues.amount;
-            }
-            else {
-                const preTotal = ldrBoardData[identifier]["total"];
-                ldrBoardData[identifier] = ldrBoardData[identifier] + expense.dataValues.amount;
-            }
+        // let userdata=await Expense.findAll({
+        //     attributes:[[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+        //     include:[{
+        //         model:User,
+        //         attributes:["name"]    
+        //     }],
+        //     group:["userId"]
+        // });
 
+        let userD=await User.findAll({
+            attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+
+            include:[{
+                model:Expense,
+                attributes:[]
+            }],
+            group:["users.id"],
+            order:[["total","DESC"]]
         })
-        console.log(ldrBoardData);
 
-        const ldrBoardDataArr=[];
-         const users=await User.findAll();
-         users.forEach(user=>{
-            ldrBoardDataArr.push({name:user.dataValues.name, total: ldrBoardData[user.dataValues.id]||0});
-         })
-        ldrBoardDataArr.sort((a,b)=>b["total"]-a["total"]);
-        res.status(201).json(ldrBoardDataArr);
+
+
+        console.log(userD);
+        res.status(201).json(userD);
+
+    //     let ldrBoardData = {};
+
+    //     const userData = await User
+    //     .findAll({
+    //             attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+                
+    //             include:[{
+    //                 model: Expense,
+    //                 attributes:["amount","userId"]
+
+    //             }],
+    //           group:["expenses.userId"]
+        
+    // });
+    // console.log(userData,"userdfatad");
+        // expenses.forEach(expense => {
+        //     const identifier = expense.dataValues.userId;
+        //     if (ldrBoardData[identifier] == undefined) {
+        //         ldrBoardData[identifier] = expense.dataValues.amount;
+        //     }
+        //     else {
+        //         const preTotal = ldrBoardData[identifier]["total"];
+        //         ldrBoardData[identifier] = ldrBoardData[identifier] + expense.dataValues.amount;
+        //     }
+
+        // })
+        
+
+        // const ldrBoardDataArr=[];
+        //  const users=await User.findAll({attributes:["name","id"]});
+        //  users.forEach(user=>{
+        //     ldrBoardDataArr.push({name:user.dataValues.name, total: ldrBoardData[user.dataValues.id]||0});
+        //  })
+        // ldrBoardDataArr.sort((a,b)=>b["total"]-a["total"]);
+        // console.log(ldrBoardDataArr);
+        // res.status(201).json(ldrBoardDataArr);
     }
     catch (err) {
         console.log(err);
