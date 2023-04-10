@@ -109,6 +109,7 @@ function onSubmit(e) {
       amount: amount
     }, { headers: { "Authorization": token } })
       .then((result) => {
+        console.log(result)
         appendDataToPage(result.data);
       })
       .catch((err) => {
@@ -206,7 +207,7 @@ function showLdrBrd(){
 
 function appendToLeaderBoard(obj){
   const li=document.createElement("li");
-  li.appendChild(document.createTextNode(`${obj.name} has spent ${obj.total}`));
+  li.appendChild(document.createTextNode(`${obj.name} has spent ${obj.totalExpense}`));
   document.getElementById("boardItems").appendChild(li);
 
 }

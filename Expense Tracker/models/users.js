@@ -24,6 +24,10 @@ const User=sequelize.define("users",{
     premium:{
         type:Sequelize.STRING,
         defaultValue:"no"
+    },
+    totalExpense:{
+        type:Sequelize.INTEGER,
+        defaultValue:0
     }
 })
 

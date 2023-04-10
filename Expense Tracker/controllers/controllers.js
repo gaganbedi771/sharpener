@@ -106,34 +106,100 @@ exports.addExpense = (req, res, next) => {
         throw new Error("All fields are necessary");
     }
 
-    req.user.createExpense
-        // Expense.create
-        ({
-            category: category,
-            amount: amount,
-            description: description
-            // userId: req.user.userId
-        })
+
+    const p1 = new Promise((resolve, reject) => {
+        resolve(
+            req.user.createExpense
+                ({
+                    category: category,
+                    amount: amount,
+                    description: description
+                })
+        )
+    })
+
+    const p2 = new Promise(async (resolve, reject) => {
+
+        User.findByPk(req.user.dataValues.id)
+            .then(result => {
+                const preTotal = Number(result.dataValues.totalExpense);
+                const newTotal = preTotal + Number(amount);
+
+                resolve(
+                    result.update({ totalExpense: newTotal })
+                )
+            })
+            .catch(err => reject(err))
+    })
+
+    Promise.all([p1, p2])
         .then((result) => {
-            res.status(201).json(result);
+            res.status(201).json(result[0]);
         })
         .catch(err => {
             console.log(err);
             res.status(500).json(err);
         })
+
+    // req.user.createExpense
+    //     // Expense.create
+    //     ({
+    //         category: category,
+    //         amount: amount,
+    //         description: description
+    //         // userId: req.user.userId
+    //     })
+    //     .then((result) => {
+    //         res.status(201).json(result);
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //         res.status(500).json(err);
+    //     })
 }
 
-exports.deleteExpense = (req, res, next) => {
+exports.deleteExpense = async (req, res, next) => {
 
-    const id = req.params.id
-    Expense.destroy({ where: { id: id, userId: req.user.dataValues.id } })
-        .then(result => {
-            res.sendStatus(201);
+    try {
+        const id = req.params.id
+        const expense = await Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } });
+        const amount = expense.dataValues.amount;
+
+        const p1 = new Promise((resolve, reject) => {
+            resolve(expense.destroy());
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
+
+        const p2 = new Promise((resolve, reject) => {
+            User.findByPk(req.user.dataValues.id)
+                .then(result => {
+                    const preTotal = Number(result.dataValues.totalExpense);
+                    const newTotal = preTotal - Number(amount);
+
+                    resolve(
+                        result.update({ totalExpense: newTotal })
+                    )
+                })
+                .catch(err => reject(err))
         })
+
+        Promise.all([p1, p2])
+            .then(() => {
+                res.sendStatus(201);
+            })
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+
+    // Expense.destroy({ where: { id: id, userId: req.user.dataValues.id } })
+    //     .then(result => {
+    //         res.sendStatus(201);
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //         res.status(500).json(err);
+    //     })
 }
 
 exports.getDetail = (req, res, next) => {
@@ -150,7 +216,7 @@ exports.getDetail = (req, res, next) => {
         })
 }
 
-exports.updateDetails = (req, res, next) => {
+exports.updateDetails = async (req, res, next) => {
     const id = req.params.id;
     const category = req.body.category
     const description = req.body.description
@@ -160,18 +226,43 @@ exports.updateDetails = (req, res, next) => {
         throw new Error("All fields are necessary");
     }
 
-    Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } })
-        .then(async (result) => {
-            result.category = category
-            result.description = description
-            result.amount = amount
-            await result.save();
-            res.status(201).json(result);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        })
+    const expense = await Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } })
+    const preAmount =Number( expense.dataValues.amount);
+
+    const user = await User.findByPk(req.user.dataValues.id);
+    // console.log(user.dataValues.totalExpense);
+    const totalAmount = Number(user.dataValues.totalExpense);
+    const newTotal = totalAmount - preAmount + Number(amount);
+
+    const p1 = new Promise((resolve, reject) => {
+        resolve(expense.update({ amount: amount }))
+    })
+
+    const p2 = new Promise((resolve, reject) => {
+        resolve(user.update({ totalExpense: newTotal }))
+    })
+
+    Promise.all([p1,p2])
+    .then(result=>{
+        res.status(201).json(result[0]);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    })
+
+    // Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } })
+    //     .then(async (result) => {
+    //         result.category = category
+    //         result.description = description
+    //         result.amount = amount
+    //         await result.save();
+    //         res.status(201).json(result);
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //         res.status(500).json(err);
+    //     })
 }
 
 exports.buyPremium = (req, res, next) => {
@@ -271,37 +362,41 @@ exports.showLeaderBoard = async (req, res, next) => {
         //     group:["userId"]
         // });
 
-        let userD=await User.findAll({
-            attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+        // let userD = await User.findAll({
+        //     attributes: ["name", [sequelize.fn("sum", sequelize.col("expenses.amount")), "total"]],
 
-            include:[{
-                model:Expense,
-                attributes:[]
-            }],
-            group:["users.id"],
-            order:[["total","DESC"]]
-        })
+        //     include: [{
+        //         model: Expense,
+        //         attributes: []
+        //     }],
+        //     group: ["users.id"],
+        //     order: [["total", "DESC"]]
+        // })
 
+        // console.log(userD);
 
+        let usersExpense = await User.findAll({
+            attributes: ["name", "totalExpense"]
+        });
+        console.log(usersExpense);
 
-        console.log(userD);
-        res.status(201).json(userD);
+        res.status(201).json(usersExpense);
 
-    //     let ldrBoardData = {};
+        //     let ldrBoardData = {};
 
-    //     const userData = await User
-    //     .findAll({
-    //             attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
-                
-    //             include:[{
-    //                 model: Expense,
-    //                 attributes:["amount","userId"]
+        //     const userData = await User
+        //     .findAll({
+        //             attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
 
-    //             }],
-    //           group:["expenses.userId"]
-        
-    // });
-    // console.log(userData,"userdfatad");
+        //             include:[{
+        //                 model: Expense,
+        //                 attributes:["amount","userId"]
+
+        //             }],
+        //           group:["expenses.userId"]
+
+        // });
+        // console.log(userData,"userdfatad");
         // expenses.forEach(expense => {
         //     const identifier = expense.dataValues.userId;
         //     if (ldrBoardData[identifier] == undefined) {
@@ -313,7 +408,7 @@ exports.showLeaderBoard = async (req, res, next) => {
         //     }
 
         // })
-        
+
 
         // const ldrBoardDataArr=[];
         //  const users=await User.findAll({attributes:["name","id"]});
