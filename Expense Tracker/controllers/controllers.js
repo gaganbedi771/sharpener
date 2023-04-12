@@ -96,11 +96,14 @@ exports.getAll = (req, res, next) => {
         })
 }
 
-exports.addExpense = (req, res, next) => {
+exports.addExpense = async (req, res, next) => {
 
     const category = req.body.category
     const description = req.body.description
     const amount = req.body.amount
+
+    const newTotal = Number(req.user.totalExpense) + Number(amount)
+    const t = await sequelize.transaction();
 
     if (!category || !description || !amount) {
         throw new Error("All fields are necessary");
@@ -114,29 +117,23 @@ exports.addExpense = (req, res, next) => {
                     category: category,
                     amount: amount,
                     description: description
-                })
+                }, { transaction: t })
         )
     })
 
     const p2 = new Promise(async (resolve, reject) => {
-
-        User.findByPk(req.user.dataValues.id)
-            .then(result => {
-                const preTotal = Number(result.dataValues.totalExpense);
-                const newTotal = preTotal + Number(amount);
-
-                resolve(
-                    result.update({ totalExpense: newTotal })
-                )
-            })
-            .catch(err => reject(err))
+        resolve(
+            req.user.update({ totalExpense: newTotal }, { transaction: t })
+        )
     })
 
     Promise.all([p1, p2])
-        .then((result) => {
+        .then(async (result) => {
+            await t.commit();
             res.status(201).json(result[0]);
         })
-        .catch(err => {
+        .catch(async (err) => {
+            await t.rollback();
             console.log(err);
             res.status(500).json(err);
         })
@@ -159,35 +156,32 @@ exports.addExpense = (req, res, next) => {
 }
 
 exports.deleteExpense = async (req, res, next) => {
-
+    const t = await sequelize.transaction();
     try {
         const id = req.params.id
         const expense = await Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } });
         const amount = expense.dataValues.amount;
+        const newTotal = Number(req.user.totalExpense) - Number(amount);
 
         const p1 = new Promise((resolve, reject) => {
-            resolve(expense.destroy());
+            resolve(expense.destroy({ transaction: t }));
         })
 
         const p2 = new Promise((resolve, reject) => {
-            User.findByPk(req.user.dataValues.id)
-                .then(result => {
-                    const preTotal = Number(result.dataValues.totalExpense);
-                    const newTotal = preTotal - Number(amount);
 
-                    resolve(
-                        result.update({ totalExpense: newTotal })
-                    )
-                })
-                .catch(err => reject(err))
+            resolve(
+                req.user.update({ totalExpense: newTotal }, { transaction: t })
+            )
         })
 
         Promise.all([p1, p2])
-            .then(() => {
+            .then(async () => {
+                await t.commit();
                 res.sendStatus(201);
             })
     }
     catch (err) {
+        await t.rollback();
         console.log(err);
         res.status(500).json(err);
     }
@@ -217,39 +211,41 @@ exports.getDetail = (req, res, next) => {
 }
 
 exports.updateDetails = async (req, res, next) => {
-    const id = req.params.id;
-    const category = req.body.category
-    const description = req.body.description
-    const amount = req.body.amount
+    try {
+        const id = req.params.id;
+        const category = req.body.category
+        const description = req.body.description
+        const amount = req.body.amount
+        const t = await sequelize.transaction();
 
-    if (!category || !description || !amount) {
-        throw new Error("All fields are necessary");
-    }
+        if (!category || !description || !amount) {
+            throw new Error("All fields are necessary");
+        }
 
-    const expense = await Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } })
-    const preAmount =Number( expense.dataValues.amount);
+        const expense = await Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } })
+        const preAmount = Number(expense.dataValues.amount);
 
-    const user = await User.findByPk(req.user.dataValues.id);
-    // console.log(user.dataValues.totalExpense);
-    const totalAmount = Number(user.dataValues.totalExpense);
-    const newTotal = totalAmount - preAmount + Number(amount);
+        const totalAmount = Number(req.user.totalExpense);
+        const newTotal = totalAmount - preAmount + Number(amount);
 
-    const p1 = new Promise((resolve, reject) => {
-        resolve(expense.update({ amount: amount }))
-    })
+        const p1 = new Promise((resolve, reject) => {
+            resolve(expense.update({ amount: amount }, { transaction: t }))
+        })
 
-    const p2 = new Promise((resolve, reject) => {
-        resolve(user.update({ totalExpense: newTotal }))
-    })
+        const p2 = new Promise((resolve, reject) => {
+            resolve(req.user.update({ totalExpense: newTotal }, { transaction: t }))
+        })
 
-    Promise.all([p1,p2])
-    .then(result=>{
+        const result = await Promise.all([p1, p2])
+
+        await t.commit();
         res.status(201).json(result[0]);
-    })
-    .catch(err => {
+    }
+    catch (err) {
+        await t.rollback();
         console.log(err);
         res.status(500).json(err);
-    })
+    }
 
     // Expense.findOne({ where: { id: id, userId: req.user.dataValues.id } })
     //     .then(async (result) => {
@@ -265,7 +261,7 @@ exports.updateDetails = async (req, res, next) => {
     //     })
 }
 
-exports.buyPremium = (req, res, next) => {
+exports.buyPremium = async (req, res, next) => {
 
     const rzp = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
@@ -277,17 +273,20 @@ exports.buyPremium = (req, res, next) => {
         currency: "INR"
     }
 
+    const t = await sequelize.transaction();
     rzp.orders.create(options, (err, order) => {
         if (err) {
             console.log(err);
             throw new Error(JSON.stringify(err));
         }
-        //console.log(order);
-        req.user.createOrder({ orderid: order.id, status: "PENDING" })
-            .then(() => {
+
+        req.user.createOrder({ orderid: order.id, status: "PENDING" }, { transaction: t })
+            .then(async () => {
+                await t.commit();
                 return res.status(201).json({ order, key_id: rzp.key_id });
             })
-            .catch(err => {
+            .catch(async err => {
+                await t.rollback();
                 console.log(err);
                 return res.status(403).json({ message: "Something wrong", error: err });
             })
@@ -296,133 +295,133 @@ exports.buyPremium = (req, res, next) => {
 
 exports.updatePremium = async (req, res, next) => {
 
-    const id = req.user.dataValues.id;
-    const name = req.user.dataValues.name;
-
-    const order = await Order.findOne({ where: { orderid: req.body.order_id } });
-
-    const p1 = new Promise((resolve, reject) => {
-        resolve(order.update({ paymentid: req.body.payment_id, status: "Success" }))
-    })
-    const p2 = new Promise((resolve, reject) => {
-        resolve(req.user.update({ premium: "yes" }))
-    })
-
-    Promise.all([p1, p2])
-        .then(() => {
-            res.status(201).json({ message: "Tables Updated", token: generateAccessToken(id, name, "yes") })
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ err: err });
-        })
-}
-
-exports.updateFailure = (req, res, next) => {
-
-    Order.findOne({ where: { orderid: req.body.order_id } })
-        .then(order => {
-            order.update({ status: "failed" })
-                .then(() => {
-                    res.status(201).json({ message: "Table updated" });
-                })
-                .catch(err => {
-                    console.log(err)
-                    res.status(500).json(err);
-                })
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ err: err })
-        })
-}
-
-exports.checkPremium = (req, res, next) => {
-
-    const userId = req.user.dataValues.id;
-    User.findByPk(userId)
-        .then(user => {
-            res.status(201).json({ message: user.dataValues.premium });
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ message: "cannot fetch premium details" });
-        })
-}
-
-exports.showLeaderBoard = async (req, res, next) => {
     try {
+        const id = req.user.dataValues.id;
+        const name = req.user.dataValues.name;
 
-        // let userdata=await Expense.findAll({
-        //     attributes:[[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
-        //     include:[{
-        //         model:User,
-        //         attributes:["name"]    
-        //     }],
-        //     group:["userId"]
-        // });
+        const order = await Order.findOne({ where: { orderid: req.body.order_id } });
+        const t = await sequelize.transaction();
 
-        // let userD = await User.findAll({
-        //     attributes: ["name", [sequelize.fn("sum", sequelize.col("expenses.amount")), "total"]],
+        const p1 = new Promise((resolve, reject) => {
+            resolve(order.update({ paymentid: req.body.payment_id, status: "Success" }, { transaction: t }))
+        })
+        const p2 = new Promise((resolve, reject) => {
+            resolve(req.user.update({ premium: "yes" }, { transaction: t }))
+        })
 
-        //     include: [{
-        //         model: Expense,
-        //         attributes: []
-        //     }],
-        //     group: ["users.id"],
-        //     order: [["total", "DESC"]]
-        // })
+        await Promise.all([p1, p2])
 
-        // console.log(userD);
+        await t.commit();
+        res.status(201).json({ message: "Tables Updated", token: generateAccessToken(id, name, "yes") })
 
-        let usersExpense = await User.findAll({
-            attributes: ["name", "totalExpense"]
-        });
-        console.log(usersExpense);
+    }
 
-        res.status(201).json(usersExpense);
+    catch (err) {
+        await t.rollback();
+        console.log(err)
+        res.status(500).json({ err: err });
+    }
+}
 
-        //     let ldrBoardData = {};
+exports.updateFailure = async (req, res, next) => {
 
-        //     const userData = await User
-        //     .findAll({
-        //             attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+    try {
+        const order = await Order.findOne({ where: { orderid: req.body.order_id } })
+        await order.update({ status: "failed" });
+        res.status(201).json({ message: "Table updated" });
+    }
 
-        //             include:[{
-        //                 model: Expense,
-        //                 attributes:["amount","userId"]
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ err: err })
+    }
+}
 
-        //             }],
-        //           group:["expenses.userId"]
+exports.checkPremium = async (req, res, next) => {
+    try {
+        const userId = req.user.dataValues.id;
+        const user = await User.findByPk(userId)
 
-        // });
-        // console.log(userData,"userdfatad");
-        // expenses.forEach(expense => {
-        //     const identifier = expense.dataValues.userId;
-        //     if (ldrBoardData[identifier] == undefined) {
-        //         ldrBoardData[identifier] = expense.dataValues.amount;
-        //     }
-        //     else {
-        //         const preTotal = ldrBoardData[identifier]["total"];
-        //         ldrBoardData[identifier] = ldrBoardData[identifier] + expense.dataValues.amount;
-        //     }
-
-        // })
-
-
-        // const ldrBoardDataArr=[];
-        //  const users=await User.findAll({attributes:["name","id"]});
-        //  users.forEach(user=>{
-        //     ldrBoardDataArr.push({name:user.dataValues.name, total: ldrBoardData[user.dataValues.id]||0});
-        //  })
-        // ldrBoardDataArr.sort((a,b)=>b["total"]-a["total"]);
-        // console.log(ldrBoardDataArr);
-        // res.status(201).json(ldrBoardDataArr);
+        res.status(201).json({ message: user.dataValues.premium });
     }
     catch (err) {
         console.log(err);
-        res.status(500).json(err);
+        res.status(500).json({ message: "cannot fetch premium details" });
     }
-
-
 }
+
+    exports.showLeaderBoard = async (req, res, next) => {
+
+        try {
+            // let userdata=await Expense.findAll({
+            //     attributes:[[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+            //     include:[{
+            //         model:User,
+            //         attributes:["name"]    
+            //     }],
+            //     group:["userId"]
+            // });
+
+            // let userD = await User.findAll({
+            //     attributes: ["name", [sequelize.fn("sum", sequelize.col("expenses.amount")), "total"]],
+
+            //     include: [{
+            //         model: Expense,
+            //         attributes: []
+            //     }],
+            //     group: ["users.id"],
+            //     order: [["total", "DESC"]]
+            // })
+
+            // console.log(userD);
+
+            let usersExpense = await User.findAll({
+                attributes: ["name", "totalExpense"],
+                order: [["totalExpense", "DESC"]]
+            });
+            // console.log(usersExpense);
+
+            res.status(201).json(usersExpense);
+
+            //     let ldrBoardData = {};
+
+            //     const userData = await User
+            //     .findAll({
+            //             attributes:["name",[sequelize.fn("sum",sequelize.col("expenses.amount")),"total"]],
+
+            //             include:[{
+            //                 model: Expense,
+            //                 attributes:["amount","userId"]
+
+            //             }],
+            //           group:["expenses.userId"]
+
+            // });
+            // console.log(userData,"userdfatad");
+            // expenses.forEach(expense => {
+            //     const identifier = expense.dataValues.userId;
+            //     if (ldrBoardData[identifier] == undefined) {
+            //         ldrBoardData[identifier] = expense.dataValues.amount;
+            //     }
+            //     else {
+            //         const preTotal = ldrBoardData[identifier]["total"];
+            //         ldrBoardData[identifier] = ldrBoardData[identifier] + expense.dataValues.amount;
+            //     }
+
+            // })
+
+
+            // const ldrBoardDataArr=[];
+            //  const users=await User.findAll({attributes:["name","id"]});
+            //  users.forEach(user=>{
+            //     ldrBoardDataArr.push({name:user.dataValues.name, total: ldrBoardData[user.dataValues.id]||0});
+            //  })
+            // ldrBoardDataArr.sort((a,b)=>b["total"]-a["total"]);
+            // console.log(ldrBoardDataArr);
+            // res.status(201).json(ldrBoardDataArr);
+        }
+        catch (err) {
+            console.log(err);
+            res.status(500).json(err);
+        }
+    }
