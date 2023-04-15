@@ -20,6 +20,14 @@ const User=sequelize.define("users",{
     password:{
         type:Sequelize.STRING,
         allowNull:false
+    },
+    premium:{
+        type:Sequelize.STRING,
+        defaultValue:"no"
+    },
+    totalExpense:{
+        type:Sequelize.INTEGER,
+        defaultValue:0
     }
 })
 

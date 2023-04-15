@@ -7,29 +7,31 @@ const Expense = require("./models/expense");
 const sequelize = require("./util/database");
 const expenseRoutes = require("./routes/expense");
 const userRoutes = require("./routes/users");
+const premiumRoutes = require("./routes/premiumUser");
+const resetPassRoutes = require("./routes/resetPass");
+const Order = require("./models/order");
+const findAll = require("./controllers/controllers");
 
-const error404 = require("./controllers/error")
+const error404 = require("./controllers/error");
+
 
 const app = express();
 
 app.use(cors());
 app.use(bodyparser.json())
 
-// app.use((req, res, next) => {
-//     User.findByPk(1)
-//         .then(user => {
-//             req.user = user;
-//             next();
-//         })
-//         .catch(err=>console.log(err));
-// })
-
 app.use(userRoutes);
 app.use(expenseRoutes);
+app.use(premiumRoutes);
+app.use(resetPassRoutes);
 app.use(error404.error);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
+User.hasMany(Order);
+Order.belongsTo(User);
+
+// findAll.showLeaderBoard();
 
 sequelize.sync()
     // sequelize.sync({force:true})
