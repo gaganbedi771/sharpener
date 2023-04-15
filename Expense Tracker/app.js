@@ -7,9 +7,10 @@ const Expense = require("./models/expense");
 const sequelize = require("./util/database");
 const expenseRoutes = require("./routes/expense");
 const userRoutes = require("./routes/users");
-const premiumRoutes=require("./routes/premiumUser");
+const premiumRoutes = require("./routes/premiumUser");
+const resetPassRoutes = require("./routes/resetPass");
 const Order = require("./models/order");
-const findAll=require("./controllers/controllers");
+const findAll = require("./controllers/controllers");
 
 const error404 = require("./controllers/error");
 
@@ -22,6 +23,7 @@ app.use(bodyparser.json())
 app.use(userRoutes);
 app.use(expenseRoutes);
 app.use(premiumRoutes);
+app.use(resetPassRoutes);
 app.use(error404.error);
 
 User.hasMany(Expense);
