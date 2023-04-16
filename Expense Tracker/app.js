@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyparser = require("body-parser");
 const User = require("./models/users");
 const Expense = require("./models/expense");
+const passRequest = require("./models/ForgotPasswordRequests");
 
 const sequelize = require("./util/database");
 const expenseRoutes = require("./routes/expense");
@@ -19,6 +20,7 @@ const app = express();
 
 app.use(cors());
 app.use(bodyparser.json())
+app.use(bodyparser.urlencoded({extended:false}))
 
 app.use(userRoutes);
 app.use(expenseRoutes);
@@ -30,6 +32,9 @@ User.hasMany(Expense);
 Expense.belongsTo(User);
 User.hasMany(Order);
 Order.belongsTo(User);
+
+passRequest.belongsTo(User);
+User.hasMany(passRequest);
 
 // findAll.showLeaderBoard();
 

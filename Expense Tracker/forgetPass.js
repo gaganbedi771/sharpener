@@ -1,10 +1,9 @@
 function passReset(e){
     e.preventDefault();
     const email=e.target.email.value;
-    console.log(email,"this is email")
     axios.post("http://localhost:1000/password/forgotpassword ",{email:email})
     .then((result)=>{
-        console.log(result);
+        window.alert("Reset link sent, please check email");
     })
     .catch(err=>{
         console.log(err)
