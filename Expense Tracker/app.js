@@ -11,6 +11,7 @@ const userRoutes = require("./routes/users");
 const premiumRoutes = require("./routes/premiumUser");
 const resetPassRoutes = require("./routes/resetPass");
 const Order = require("./models/order");
+const DownloadedExpense = require("./models/downloadedExpense");
 const findAll = require("./controllers/controllers");
 
 const error404 = require("./controllers/error");
@@ -30,11 +31,15 @@ app.use(error404.error);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
 User.hasMany(Order);
 Order.belongsTo(User);
 
 passRequest.belongsTo(User);
 User.hasMany(passRequest);
+
+DownloadedExpense.belongsTo(User);
+User.hasMany(DownloadedExpense);
 
 // findAll.showLeaderBoard();
 

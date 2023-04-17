@@ -6,12 +6,12 @@ function premiumFeatures() {
   document.getElementById("ifPremium").innerHTML = "You are a premium user ";
   const ldrBoard = document.createElement("button");
   ldrBoard.className = "btn btn-success float-right";
-  ldrBoard.id="ldrBrdBtn";
+  ldrBoard.id = "ldrBrdBtn";
   ldrBoard.appendChild(document.createTextNode("LeaderBoard"));
   document.getElementById("ifPremium").append(ldrBoard);
-  ldrBoard.addEventListener("click",showLdrBrd);
+  ldrBoard.addEventListener("click", showLdrBrd);
 
-  document.getElementById("downloadexpense").disabled=false
+  document.getElementById("downloadexpense").disabled = false
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -190,30 +190,56 @@ function buyPre(e) {
     })
 }
 
-function showLdrBrd(){
-    
-  const p=document.createElement("h3");
-  p.className="text-center px-5 py-0 badge-secondary"
+function showLdrBrd() {
+
+  const p = document.createElement("h3");
+  p.className = "text-center px-5 py-0 badge-secondary"
   p.appendChild(document.createTextNode("Leaderboard"))
-  const LeaderBoard=document.getElementById("LeaderBoard");
-  const boardItems=document.getElementById("boardItems");
-  LeaderBoard.insertBefore(p,boardItems);
-  axios.get("http://localhost:1000/purchasePremium/showLeaderBoard",{headers:{"Authorization":token}})
-  .then(result=>{
-   console.log(result.data)
-    result.data.forEach(data=>{
-      appendToLeaderBoard(data);
+  const LeaderBoard = document.getElementById("LeaderBoard");
+  const boardItems = document.getElementById("boardItems");
+  LeaderBoard.insertBefore(p, boardItems);
+  axios.get("http://localhost:1000/purchasePremium/showLeaderBoard", { headers: { "Authorization": token } })
+    .then(result => {
+      //  console.log(result.data)
+      result.data.forEach(data => {
+        appendToLeaderBoard(data);
+      })
     })
-  })
 }
 
-function appendToLeaderBoard(obj){
-  const li=document.createElement("li");
+function appendToLeaderBoard(obj) {
+  const li = document.createElement("li");
   li.appendChild(document.createTextNode(`${obj.name} has spent ${obj.totalExpense}`));
   document.getElementById("boardItems").appendChild(li);
 
 }
 
-function download(){
-  
+function download() {
+  axios.get("http://localhost:1000/download", { headers: { Authorization: token } })
+    .then(result => {
+      console.log(result.data);
+      let list = result.data.list;
+
+      const p = document.createElement("h3");
+      p.className = "text-center px-5 py-0 badge-secondary"
+      p.appendChild(document.createTextNode("Previous Generated Files"))
+      const downloadedFiles = document.getElementById("downloadedFiles");
+      const filesList = document.getElementById("filesList");
+      downloadedFiles.insertBefore(p, filesList);
+
+      list.forEach(item => {
+        console.log(item)
+        const li = document.createElement("li");
+        li.innerHTML=`<a href=${item.link}>Created at ${item.date}</a>`
+        document.getElementById("filesList").appendChild(li);
+      })
+      const a = document.createElement("a");
+      a.href = result.data.fileUrl;
+      a.download = "myexpense.csv";
+      a.click();
+    })
+    .catch(err => {
+      console.log(err);
+      throw new Error(err);
+    })
 }
