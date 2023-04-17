@@ -10,6 +10,8 @@ function premiumFeatures() {
   ldrBoard.appendChild(document.createTextNode("LeaderBoard"));
   document.getElementById("ifPremium").append(ldrBoard);
   ldrBoard.addEventListener("click",showLdrBrd);
+
+  document.getElementById("downloadexpense").disabled=false
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -210,4 +212,8 @@ function appendToLeaderBoard(obj){
   li.appendChild(document.createTextNode(`${obj.name} has spent ${obj.totalExpense}`));
   document.getElementById("boardItems").appendChild(li);
 
+}
+
+function download(){
+  
 }
