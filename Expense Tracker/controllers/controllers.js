@@ -3,7 +3,7 @@ const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const Order = require("../models/order");
 const sequelize = require("../util/database");
-const userServices=require("../services/userservices");
+const userServices = require("../services/userservices");
 
 
 exports.signUp = async (req, res, next) => {
@@ -79,16 +79,41 @@ exports.signIn = async (req, res, next) => {
 
 }
 
-exports.getAll = (req, res, next) => {
+exports.getAll = async (req, res, next) => {
+    try {
+        const page = Number(req.query.page);
+        const entries = Number(req.query.entries);
+        // console.log(page,"page no requested",entries);
+        const p1 = new Promise((resolve, reject) => {
+            resolve(req.user.countExpenses())
+        })
 
-    Expense.findAll({ where: { userId: req.user.dataValues.id } })
-        .then((data) => {
-            res.status(201).json(data);
+        const p2 = new Promise((resolve, reject) => {
+            resolve(req.user.getExpenses({
+                offset: (page - 1) * entries,
+                limit: entries
+            }))
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        })
+
+        const [total,data] = await Promise.all([p1, p2]);
+
+        res.status(201).json({ 
+            expenses: data, 
+            IsPremium: req.user.premium,
+            currentPage:page,
+            hasPreviousPage:page>1,
+            previousPage:page-1,
+            hasNextPage:entries*page<total,
+            nextPage:page+1,
+            lastPage:Math.ceil(total/entries)
+        
+        });
+    }
+
+    catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
 }
 
 exports.addExpense = async (req, res, next) => {

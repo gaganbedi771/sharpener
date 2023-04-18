@@ -14,35 +14,119 @@ function premiumFeatures() {
   document.getElementById("downloadexpense").disabled = false
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
 
-  axios.get("http://localhost:1000/getAll", { headers: { "Authorization": token } })
-    .then((allData) => {
-      allData.data.forEach((data) => {
-        appendDataToPage(data);
-      })
+  const page = 1;
+  const entries = 3;
+  try {
+
+    // const allData=await axios.get(`http://localhost:1000/getAll?page=${page}&entries=${entries}`, { headers: { "Authorization": token } })
+    const allData = await getAllSelected(page, entries)
+    // console.log(allData)
+    const { expenses, IsPremium, ...pageInfo } = allData.data;
+    // console.log(expenses,IsPremium,pageInfo)
+
+    if (IsPremium == "yes") {
+      premiumFeatures();
+    }
+
+    expenses.forEach((expense) => {
+      appendDataToPage(expense);
     })
-    .catch(err => {
-      console.log(err);
-    })
+    // console.log(allData)
+    pagination(pageInfo);
+  }
 
-  axios.get("http://localhost:1000/checkPremium", { headers: { "Authorization": token } })
-    .then(result => {
-
-      if (result.data.message == "yes") {
-
-        premiumFeatures();
-
-      }
-    })
-    .catch(err => console.log(err))
-
+  catch (err) {
+    console.log(err);
+  }
 
 })
+
+function pagination({ currentPage, hasPreviousPage, previousPage, hasNextPage, nextPage, lastPage }) {
+
+  // console.log(currentPage,previousPage,nextPage,lastPage);
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = ""
+
+  if (hasPreviousPage) {
+    const btnPre = document.createElement("button");
+    btnPre.innerHTML = previousPage;
+    btnPre.addEventListener("click", () => getPaginated(previousPage));
+    pagination.appendChild(btnPre);
+  }
+  const btnCurr = document.createElement('button');
+  btnCurr.innerHTML = `<h5>${currentPage}</h5>`;
+  btnCurr.addEventListener('click', () => getPaginated(currentPage));
+  pagination.appendChild(btnCurr);
+
+  if (hasNextPage && lastPage != nextPage) {
+    const btnNxt = document.createElement("button");
+    btnNxt.innerHTML = nextPage;
+    btnNxt.addEventListener("click", () => getPaginated(nextPage));
+    pagination.appendChild(btnNxt);
+  }
+
+  if (lastPage != currentPage) {
+    const btnLast = document.createElement("button");
+    btnLast.innerHTML = "...lastPage";
+    btnLast.addEventListener("click", () => getPaginated(lastPage));
+    pagination.appendChild(btnLast);
+  }
+}
+
+function getPaginated(page) {
+  const entries = document.getElementById("numOfEntries").value;
+  document.getElementById("listitems").innerHTML = "";
+  getAndSet(page, entries);
+}
+
+function getAllSelected(page, entries) {
+  return new Promise((resolve, reject) => {
+    resolve(axios.get(`http://localhost:1000/getAll?page=${page}&entries=${entries}`, { headers: { "Authorization": token } }))
+  }
+  )
+}
 
 document.getElementById("my-form").addEventListener("submit", onSubmit);
 document.getElementById("listitems").addEventListener("click", onClick);
 document.getElementById("premiumButton").addEventListener("click", buyPre);
+document.getElementById("numOfEntries").addEventListener("change", onEntriesChange);
+
+async function getAndSet(page, entries) {
+  try {
+    const allData = await getAllSelected(page, entries);
+    const { expenses, IsPremium, ...pageInfo } = allData.data;
+    expenses.forEach((expense) => {
+      appendDataToPage(expense);
+    })
+    pagination(pageInfo);
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
+
+function onEntriesChange(e) {
+  // console.log(e.target.value)
+  const entries = e.target.value;
+  const page = 1;
+  document.getElementById("listitems").innerHTML = "";
+  getAndSet(page, entries)
+  // try {
+  //   const allData = await getAllSelected(page, entries);
+  //   const { expenses,IsPremium, ...pageInfo } = allData.data;
+  //   expenses.forEach((expense) => {
+  //     appendDataToPage(expense);
+  //   })
+  //   pagination(pageInfo);
+  // }
+  // catch (err) {
+  //   console.log(err);
+  // }
+
+
+}
 
 
 function onClick(e) {
@@ -230,7 +314,7 @@ function download() {
       list.forEach(item => {
         console.log(item)
         const li = document.createElement("li");
-        li.innerHTML=`<a href=${item.link}>Created at ${item.date}</a>`
+        li.innerHTML = `<a href=${item.link}>Created at ${item.date}</a>`
         document.getElementById("filesList").appendChild(li);
       })
       const a = document.createElement("a");
