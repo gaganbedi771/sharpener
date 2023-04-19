@@ -17,7 +17,7 @@ function premiumFeatures() {
 window.addEventListener("DOMContentLoaded", async () => {
 
   const page = 1;
-  const entries = localStorage.getItem("entries");
+  const entries = localStorage.getItem("entries")||2;
   document.getElementById("numOfEntries").value=entries;
   try {
 

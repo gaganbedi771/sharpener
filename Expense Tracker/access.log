@@ -1,0 +1,1 @@
+::1 - - [19/Apr/2023:09:25:05 +0000] "GET /getAll?page=1&entries=2 HTTP/1.1" 201 437 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
