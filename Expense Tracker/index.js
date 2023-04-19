@@ -17,7 +17,8 @@ function premiumFeatures() {
 window.addEventListener("DOMContentLoaded", async () => {
 
   const page = 1;
-  const entries = 3;
+  const entries = localStorage.getItem("entries");
+  document.getElementById("numOfEntries").value=entries;
   try {
 
     // const allData=await axios.get(`http://localhost:1000/getAll?page=${page}&entries=${entries}`, { headers: { "Authorization": token } })
@@ -110,6 +111,7 @@ async function getAndSet(page, entries) {
 function onEntriesChange(e) {
   // console.log(e.target.value)
   const entries = e.target.value;
+  localStorage.setItem("entries",entries);
   const page = 1;
   document.getElementById("listitems").innerHTML = "";
   getAndSet(page, entries)
