@@ -40,7 +40,7 @@ exports.sendLink = async (req, res, next) => {
                 sender,
                 to: receivers,
                 subject: "Reset requested",
-                textContent: `Click the link to reset: http://localhost:1000/password/resetpassword/${uuid}`
+                textContent: `Click the link to reset: http://localhost:2000/password/resetpassword/${uuid}`
             }))
         })
 

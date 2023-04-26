@@ -4,9 +4,9 @@ const bodyparser = require("body-parser");
 const User = require("./models/users");
 const Expense = require("./models/expense");
 const passRequest = require("./models/ForgotPasswordRequests");
-const helmet = require("helmet");
+// const helmet = require("helmet");
 // const compression = require("compression");
-const morgan = require("morgan");
+// const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
 
@@ -26,9 +26,9 @@ const app = express();
 const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
 
 app.use(cors());
-app.use(helmet());
+// app.use(helmet());
 // app.use(compression());
-app.use(morgan("combined", { stream: accessLogStream }));
+// app.use(morgan("combined", { stream: accessLogStream }));
 
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: false }))
@@ -37,7 +37,15 @@ app.use(userRoutes);
 app.use(expenseRoutes);
 app.use(premiumRoutes);
 app.use(resetPassRoutes);
-app.use(error404.error);
+// app.use(error404.error);
+
+app.use((req,res)=>{
+    const url=req.url;
+    console.log(url)
+    // res.sendFile(path.join(__dirname,`views/signIn.html`));
+    res.sendFile(path.join(__dirname,`views/${req.url}`));
+    
+})
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
@@ -56,7 +64,7 @@ User.hasMany(DownloadedExpense);
 sequelize.sync()
     // sequelize.sync({force:true})
     .then(result => {
-        app.listen(process.env.Port || 1000);
+        app.listen(2000);
     })
     .catch(err => {
         console.log(err);

@@ -1,0 +1,113 @@
+`aws signin: gagan@1056
+
+IAM user abcd: Abcdxyz@123
+
+rds user abcd: Abcdxyz123
+
+ssh to aws ec2 
+sudo su
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+#exit and ssh again
+nvm ls-remote
+nvm install v18.16.0
+sudo yum install git -y
+git clone url
+#cd to project folder 
+npm i
+edit env file wit credentials
+source .env
+npm start
+
+create rdb and connect with workbench
+
+lsof -i :portnumber //lists process related to portnum
+kill portnumber
+npm start //restart server
+
+install processmanager(pm2)
+npm i -g pm2
+pm2 start app.js
+pm2 logs
+
+
+
+
+
+git branch -a /get current branch
+git fetch -a //updates branches
+git checkout branchname
+
+git pull origin //to get updates from branch
+
+
+lsof -i :2000   to kill npm start
+npm start to restart
+
+npm i -g pm2
+sudo pm2 start app.js
+
+pm2 stop all
+
+install nginx:
+yum install nginx -y
+systemctl start nginx
+open port 80 of ec2 instance
+cd /etc/nginx/conf.d and add a new myc.config
+
+server {
+   listen         80 default_server;
+   listen         [::]:80 default_server;
+   server_name    localhost;
+   root           /usr/share/nginx/html;
+location / {
+       proxy_pass http://127.0.0.1:3000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection 'upgrade';
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+   }
+}
+
+Jenkins to automate git pull and restart
+
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+sudo dnf install java-11-amazon-corretto -y
+
+sudo yum install jenkins -y
+
+sudo systemctl enable jenkins
+
+sudo systemctl start jenkins
+
+goto ip:8080 (open 8080)
+
+complete setup
+goto>dashboard>credentials>system>globalcredentials(unrestricted)
+add credentials
+
+create new item
+scode managent:git
+ build now to pull from git
+code in in building workspace in output of build now
+
+sudo vi visudo and add at the end
+jenkins ALL=(ALL) NOPASSWD: ALL
+
+add the followings in build triggers> build step> execute shell
+
+sudo npm install --unsafe-perm=true --allow-root
+
+sudo pm2 stop all
+sudo pm2 start app.js
+
+build trigger>Poll SCM
+cronguru.com
+
+
