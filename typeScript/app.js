@@ -35,7 +35,7 @@ const myPromise = new Promise((resolve, reject) => {
     setTimeout(() => {
         resolve("It worked");
     }, 1000);
-});
+})
 myPromise.then((result) => {
     console.log(result.split("w"));
 });
