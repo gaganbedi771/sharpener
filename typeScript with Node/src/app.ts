@@ -1,4 +1,5 @@
-const express=require("express");
+// const express=require("express");
+import express from "express";
 import todoRoutes from "./routes/todo";
 import bodyParser from "body-parser";
 const app= express();
