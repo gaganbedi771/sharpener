@@ -2,6 +2,7 @@ const express=require("express");
 const router=express.Router();
 const loginControl= require("../controllers/loginControl");
 
-router.use("/signup",loginControl.signup);
+router.post("/signup",loginControl.signup);
+router.post("/signin",loginControl.signin);
 
 module.exports=router;

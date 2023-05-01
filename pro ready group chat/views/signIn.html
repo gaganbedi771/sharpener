@@ -10,43 +10,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <title>Sign Up</title>
+    <title>Login</title>
 </head>
 
 <body>
     <div class="container  text-center border border-dark rounded ">
 
-        
-        <h1 class="text-center"><span class="badge badge-info ">Sign Up</span></h1>
+        <h1 class="text-center"><span class="badge badge-info ">Sign In</span></h1>
         <br>
-        <form class="form-group " onsubmit="onSignup(event)"> 
-            <div class="form-group">
-                <label for="name">Enter your name</label>
-                <input type="text" id="name" class="form-control"  >
-            </div>
+        <form class="form-group" onsubmit="onSignin(event)">
 
-            <div class="form-group ">
-                <label for="email">Enter your Email</label> <br>
-                <input type="email" id="email" class="form-control" required>
+            <div class="form-group">
+                <label for="emailorphone">Enter your Email or Phone Number</label> <br>
+                <input type="emailorphone" id="emailorphone" class="form-control" required>
             </div>
 
             <div class="form-group">
-                <label for="phone">Enter your Phone Number</label> <br>
-                <input type="number" id="phone" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Create Password</label>
+                <label for="password">Enter Password</label>
                 <input type="password" id="password" class="form-control" required>
             </div>
 
             <button type="submit" class="btn btn-dark">Submit </button>
+            <a href="forgetPass.html">Forgot Password?</a>
             <br>
-           
-            <a href="signin.html">Already a user? Sign In</a>
+            <a href="signup.html">Not registered? Sign Up here</a>
 
         </form>
-        
     </div>
 
     <!-- Optional JavaScript -->
@@ -61,7 +50,7 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="signup.js">  </script>
+    <script src="signin.js">  </script>
 </body>
 
 </html>
