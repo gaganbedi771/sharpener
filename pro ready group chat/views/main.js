@@ -2,20 +2,18 @@ window.addEventListener("DOMContentLoaded", loadChat);
 
 async function loadChat() {
     const token = localStorage.getItem("token")
-    console.log("DOM LOADED")
-    const getChat = await axios.get("http://localhost:3000/getChat",{headers:{"Authorization":token}});
-    console.log(getChat);
-    console.log(getChat.data.allChat);
-    getChat.data.allChat.forEach((item)=>{
-        appendChatToPage(item.message,item.user.name);
+    const getChat = await axios.get("http://localhost:3000/getChat", { headers: { "Authorization": token } });
+    getChat.data.allChat.forEach((item) => {
+        appendChatToPage(item.message, item.user.name);
     })
-    
+
 }
 
-function appendChatToPage(message,name){
-    const li=document.createElement("li");
-    li.appendChild(document.createTextNode(`${name}: ${message}`));
-    document.getElementById("chats").appendChild(li);
+function appendChatToPage(message, name) {
+    const p = document.createElement("p");
+    p.className = "border "
+    p.appendChild(document.createTextNode(`${name}: ${message}`));
+    document.getElementById("chats").appendChild(p);
 }
 
 async function sendMsg() {
