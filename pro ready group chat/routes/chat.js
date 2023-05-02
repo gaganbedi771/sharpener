@@ -1,8 +1,9 @@
-const express=require("express");
-const router=express.Router();
-// const loginControl= require("../controllers/");
+const express = require("express");
+const router = express.Router();
+const chatControl = require("../controllers/chatControl");
+const userAuthentication = require("../middleware/authenticate");
 
-// router.post("/signup",loginControl.signup);
+router.use("/send-msg",userAuthentication, chatControl.send_msg);
 // router.post("/signin",loginControl.signin);
 
-module.exports=router;
+module.exports = router;

@@ -21,7 +21,7 @@ async function onSignup(e) {
         console.log(err.response.data.message)
         if(err.response.status==409){
             window.alert(`${err.response.data.message}`)
-            window.location.href=`../views/signup.html`;
+            window.location.href=`../views/signin.html`;
         }
         else if(err.response.status==400){
             window.alert(`${err.response.data.message}`)
