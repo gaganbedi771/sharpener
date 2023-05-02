@@ -10,6 +10,7 @@ async function onSignin(e) {
         localStorage.setItem("token", result.data.token);
 
         window.alert(result.data.message);
+        window.location.href="../views/main.html";
     }
     catch (err) {
         console.log(err);
