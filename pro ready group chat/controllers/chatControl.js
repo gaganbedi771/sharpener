@@ -19,7 +19,7 @@ exports.send_msg = async (req, res, next) => {
 
 }
 
-exports.getChat = async (req, res, next) => {
+exports.getAllChats = async (req, res, next) => {
 
     try {
         const allChat = await Chat.findAll({

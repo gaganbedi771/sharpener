@@ -1,15 +1,43 @@
 window.addEventListener("DOMContentLoaded", loadChat);
 
 async function loadChat() {
-    const token = localStorage.getItem("token")
-    const getChat = await axios.get("http://localhost:3000/getChat", { headers: { "Authorization": token } });
+    const token = localStorage.getItem("token");
+    const localChats = localStorage.getItem("localChats");
     let lastMsgId;
-    getChat.data.allChat.forEach((item) => {
-        lastMsgId = item.id;
-        appendChatToPage(item.message, item.user.name);
-    })
 
-    localStorage.setItem("lastMsgId", lastMsgId);
+    if (localChats == undefined) {
+        const getAllChats = await axios.get("http://localhost:3000/getAllChats", { headers: { "Authorization": token } });
+
+        getAllChats.data.allChat.forEach((item) => {
+            lastMsgId = item.id;
+            appendChatToPage(item.message, item.user.name);
+        })
+        localStorage.setItem("lastMsgId", lastMsgId);
+        const arrLen = getAllChats.data.allChat.length;
+        if (arrLen > 10) {
+            localStorage.setItem("localChats", JSON.stringify(getAllChats.data.allChat.slice(arrLen - 10, arrLen)));
+        }
+        else {
+            localStorage.setItem("localChats", JSON.stringify(getAllChats.data.allChat));
+        }
+
+    }
+    else {
+        
+        const parsedChats = JSON.parse(localChats);
+        console.log(parsedChats);
+
+        parsedChats.forEach((item) => {
+            lastMsgId = item.id;
+            appendChatToPage(item.message, item.user.name);
+        })
+        localStorage.setItem("lastMsgId", lastMsgId);
+
+    }
+
+    getUpdatedChats();
+
+
 }
 
 function appendChatToPage(message, name) {
@@ -44,10 +72,14 @@ async function sendMsg() {
 }
 
 setInterval(async () => {
+    getUpdatedChats();
+
+}, 10000)
+
+async function getUpdatedChats() {
     const lastMsgId = localStorage.getItem("lastMsgId");
     const token = localStorage.getItem("token");
     const updatedMsg = await axios.get(`http://localhost:3000/getUpdate/${lastMsgId}`, { headers: { "Authorization": token } });
-    console.log(updatedMsg);
 
     if (updatedMsg.data.updatedChat.length > 0) {
         let UpdatedMsgId;
@@ -57,6 +89,13 @@ setInterval(async () => {
         })
 
         localStorage.setItem("lastMsgId", UpdatedMsgId);
-    }
 
-}, 10000)
+        const arrLen = updatedMsg.data.updatedChat.length;
+        if (arrLen > 10) {
+            localStorage.setItem("localChats", JSON.stringify(updatedMsg.data.updatedChat.slice(arrLen - 10, arrLen)));
+        }
+        else {
+            localStorage.setItem("localChats", JSON.stringify(updatedMsg.data.updatedChat));
+        }
+    }
+}
