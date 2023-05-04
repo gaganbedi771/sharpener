@@ -14,21 +14,43 @@
 </head>
 
 <body>
-    <div class="container  text-center border border-dark rounded ">
+    <div class="container mt-1 mr-3 w-70 p-3 float-right col-md-8 border border-dark rounded">
 
-        <h1 class="text-center"><span class="badge badge-primary ">Chat App</span></h1>
+        <h1 class="text-center "><span class="badge badge-primary " id="chatapp">Public Chat</span></h1>
+        <button class=" float-left btn btn-sm btn-info" onclick="publicGroup()" id="publicgroup" hidden>Public Group</button>
+        <div class="float-right text-center" id="addmemberDiv" hidden >
+            <input id="addmember" type="text" placeholder="Enter Email/phone">
+            <br>
+            <button class="btn-sm  btn-info" onclick="addmember()">Add Member</button>
+        </div>
+
         <br>
-    <div class="text-center " id="chats">
-    </div>
+        <div class="text-center mb-5 p-5 " id="chats">
+        </div>
 
-        <div class="w-auto p-3 align-items-center fixed-bottom " style="background-color: #eee;">
-            <input size="100%"  type="text" id="msg" placeholder="Enter message" required>
-            <button class="btn btn-success btn-sm" onclick="sendMsg()">Send</button>
+        <div class=" align-items-center w-70 p-3  " style="background-color: #eee;">
+            <input class="input-sm col-md-11" type="text" id="msg" placeholder="Enter message" required>
+            <button class="btn btn-success btn-sm float-right" onclick="sendMsg()">Send</button>
+        </div>
+
+    </div>
+    <!--  -->
+    <div class="container w-25 p-3 mt-1 ml-3 float-left col-md-8 border border-dark rounded">
+
+        <h1 class="text-center"><span class="badge badge-secondary ">Groups</span></h1>
+       
+        <input class="float-left" type="text" id="groupName" placeholder="Enter Group Name" required>
+        <button class="float-right btn btn-sm btn-success" onclick="createGroup()">Create Group</button>
+        <br>
+        <div>
+            <ul id="groups">
+            </ul>
         </div>
 
     </div>
 
-    
+
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

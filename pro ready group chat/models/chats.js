@@ -11,6 +11,10 @@ const Chat = sequelize.define("chats", {
     message:{
         type:Sequelize.STRING,
         allowNull:false
+    },
+    groupid:{
+        type:Sequelize.INTEGER,
+        defaultValue:null
     }
 })
 
