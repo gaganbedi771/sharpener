@@ -3,7 +3,7 @@ window.addEventListener("DOMContentLoaded", loadChat);
 async function loadChat() {
 
     const p1 = new Promise((resolve, reject) => {
-        resolve(DOMloadChat(0));
+        resolve(DOMloadChat(1));
     })
 
     const p2 = new Promise((resolve, reject) => {
@@ -15,16 +15,19 @@ async function loadChat() {
         .catch(err => {
             console.log(err);
         })
-
 }
 
 async function DOMloadChat(grpid) {
     const token = localStorage.getItem("token");
     const localChats = localStorage.getItem(`localChats${grpid}`);
     let lastMsgId;
+    document.getElementById("chats").innerHTML = "";
+    // if(grpid!=0){
 
+    // }
     if (localChats == undefined) {
-        const getAllChats = await axios.get("http://localhost:3000/getAllChats", { headers: { "Authorization": token } });
+        const getAllChats = await axios.get("http://localhost:3000/getAllChats",
+            { headers: { "Authorization": token } });
         const arrLen = getAllChats.data.allChat.length;
 
         if (arrLen < 1) {
@@ -42,16 +45,14 @@ async function DOMloadChat(grpid) {
         else {
             localStorage.setItem(`localChats${grpid}`, JSON.stringify(getAllChats.data.allChat));
         }
-
     }
+
     else {
 
         const parsedChats = JSON.parse(localChats);
-        console.log(parsedChats);
 
         parsedChats.forEach((item) => {
             lastMsgId = item.id;
-            console.log(item)
             appendChatToPage(item.message, item.user.name);
         })
         localStorage.setItem(`lastMsgId${grpid}`, lastMsgId);
@@ -62,15 +63,19 @@ async function DOMloadChat(grpid) {
 
 async function getUpdatedChats(grpid) {
     let lastMsgId = localStorage.getItem(`lastMsgId${grpid}`) || 0;
-    const token = localStorage.getItem("token");
+    let token = localStorage.getItem("token")
 
-    console.log(lastMsgId, "heyyyyyyyyyyy")
-    // if (lastMsgId == undefined) {
-    //     return
-    // }
-    const updatedMsg = await axios.get(`http://localhost:3000/getUpdate/${lastMsgId}`, { headers: { "Authorization": token } });
+    if (grpid == 1) {
+        const result = await axios.get(`http://localhost:3000/getGroupToken/${grpid}`,
+            { headers: { "Authorization": token } });
+        token = result.data.token;
+    }
 
-    console.log(updatedMsg.data.updatedChat.length);
+    localStorage.setItem("token", token);
+
+    const updatedMsg = await axios.get(`http://localhost:3000/getUpdate/${lastMsgId}`,
+        { headers: { "Authorization": token } });
+
     if (updatedMsg.data.updatedChat.length > 0) {
         let UpdatedMsgId;
         let arrlocalChats;
@@ -80,7 +85,6 @@ async function getUpdatedChats(grpid) {
         else {
             arrlocalChats = JSON.parse(localStorage.getItem(`localChats${grpid}`));
         }
-
 
         updatedMsg.data.updatedChat.forEach((item) => {
             arrlocalChats.push(item);
@@ -92,7 +96,8 @@ async function getUpdatedChats(grpid) {
 
         const arrLen = arrlocalChats.length;
         if (arrLen > 10) {
-            localStorage.setItem(`localChats${grpid}`, JSON.stringify(arrlocalChats.slice(arrLen - 10, arrLen)));
+            const stringifiedArr = JSON.stringify(arrlocalChats.slice(arrLen - 10, arrLen));
+            localStorage.setItem(`localChats${grpid}`, stringifiedArr);
         }
         else {
             localStorage.setItem(`localChats${grpid}`, JSON.stringify(arrlocalChats));
@@ -102,9 +107,9 @@ async function getUpdatedChats(grpid) {
 
 async function DOMloadGroups() {
     const token = localStorage.getItem("token");
-    const getGroups = await axios.get("http://localhost:3000/getAllGroups", { headers: { "Authorization": token } });
+    const getGroups = await axios.get("http://localhost:3000/getAllGroups",
+        { headers: { "Authorization": token } });
 
-    console.log(getGroups);
     document.getElementById("groups").innerHTML = "";
 
     if (getGroups.data.allGroups.length > 0) {
@@ -119,12 +124,9 @@ async function DOMloadGroups() {
 }
 
 async function onGroupClick(e) {
-    // e.preventDefault();
-    // console.log(e.target.parentNode.name);
+
     if (e.target.classList.contains("open")) {
         document.getElementById("chatapp").innerHTML = "";
-        document.getElementById("chats").innerHTML = "";
-
         document.getElementById("chatapp").innerHTML = e.target.parentNode.name;
         document.getElementById("addmemberDiv").hidden = false;
         document.getElementById("publicgroup").hidden = false;
@@ -133,11 +135,12 @@ async function onGroupClick(e) {
             const groupId = e.target.parentNode.id;
             const token = localStorage.getItem("token")
 
-            const result = await axios.get(`http://localhost:3000/getGroupToken/${groupId}`, { headers: { "Authorization": token } });
+            const result = await axios.get(`http://localhost:3000/getGroupToken/${groupId}`,
+                { headers: { "Authorization": token } });
             localStorage.setItem("token", result.data.token);
 
-            DOMloadChat(groupId);
 
+            DOMloadChat(groupId);
         }
         catch (err) {
             console.log(err);
@@ -157,12 +160,7 @@ function appendGroupToPage(groupname, groupid) {
     btnOpen.className = "btn btn-sm btn-info float-right open";
     btnOpen.appendChild(document.createTextNode("OpenChat"));
 
-    // const btnAdd=document.createElement("button");
-    // btnAdd.className="btn btn-sm btn-info float-left addMember";
-    // btnAdd.appendChild(document.createTextNode("AddMembers"));
-
     li.appendChild(btnOpen);
-    // li.appendChild(btnAdd);
     document.getElementById("groups").appendChild(li);
 }
 
@@ -199,10 +197,11 @@ async function sendMsg() {
 
 }
 
-setInterval(() => {
-    getUpdatedChats();
+// setInterval(() => {
+//     getUpdatedChats();
+//     DOMloadGroups()
 
-}, 100000)
+// }, 1000)
 
 
 
@@ -232,32 +231,130 @@ async function addmember() {
     const token = localStorage.getItem("token");
     if (member) {
         console.log(member);
-        try{
-            const result=await axios.post("http://localhost:3000/addmember",{
-                member:member
+        try {
+            const result = await axios.post("http://localhost:3000/addmember", {
+                member: member
             }, { headers: { "Authorization": token } });
 
             window.alert("User Added");
 
         }
-        catch(err){
+        catch (err) {
             console.log(err);
-            if(err.response.status==400 || err.response.status==404){
+            if (err.response.status == 400 || err.response.status == 404) {
                 window.alert(err.response.data.message);
             }
         }
-        
+
     }
 }
 
 async function publicGroup() {
     try {
         const token = localStorage.getItem("token");
-        const result = await axios.get("http://localhost:3000/getPublicToken", { headers: { "Authorization": token } });
+        const result = await axios.get("http://localhost:3000/getPublicToken",
+            { headers: { "Authorization": token } });
         localStorage.setItem("token", result.data.token);
         window.location.href = "../views/main.html"
     }
     catch (err) {
         console.log(err);
     }
+}
+
+async function showpopup() {
+    document.getElementById("viewmembers").innerHTML = "";
+    try {
+        const token = localStorage.getItem("token");
+        const allMembers = await axios.get("http://localhost:3000/viewAllMembers",
+            { headers: { "Authorization": token } });
+
+        const admins = allMembers.data.members[1];
+        const myId = allMembers.data.myId;
+
+        const adminSet = new Set();
+        admins.forEach((admin) => {
+            adminSet.add(admin.userId)
+        })
+
+        allMembers.data.members[0][0].users.forEach((item) => {
+            appendMembersToPopup(item, adminSet, myId);
+        })
+
+
+        document.getElementById("popup").style.display = 'block';
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
+function appendMembersToPopup(member, adminSet, myId) {
+
+    const li = document.createElement("li");
+    li.id = member.id;
+    li.appendChild(document.createTextNode(`${member.name} :`))
+    // li.className = "float-left"
+
+
+    const btnAdmin = document.createElement("button");
+    btnAdmin.className = "btn btn-sm btn-link admin";
+    btnAdmin.disabled = true;
+    if (adminSet.has(member.id)) {
+        btnAdmin.appendChild(document.createTextNode("Admin"));
+    }
+    else {
+        btnAdmin.appendChild(document.createTextNode("Make Admin"));
+        if (adminSet.has(myId)) {
+            btnAdmin.disabled = false;
+        }
+    }
+
+    const btnRemove = document.createElement("button");
+    btnRemove.className = "btn btn-sm btn-link  remove";
+    btnRemove.disabled = true;
+    btnRemove.appendChild(document.createTextNode("Remove Member"));
+
+    if (adminSet.has(myId) || member.id == myId) {
+        btnRemove.disabled = false;
+    }
+
+    li.appendChild(btnAdmin);
+    li.appendChild(btnRemove);
+    document.getElementById("viewmembers").appendChild(li);
+}
+
+document.getElementById("viewmembers").addEventListener("click", memberClick);
+
+async function memberClick(e) {
+    const userid = e.target.parentNode.id;
+    const token = localStorage.getItem("token");
+
+    if (e.target.classList.contains("admin")) {
+        try {
+            const result = await axios.get(`http://localhost:3000/addAdmin/${userid}`,
+                { headers: { "Authorization": token } });
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+
+    }
+    else if (e.target.classList.contains("remove")) {
+        console.log("Remove")
+
+        try {
+            const result = await axios.get(`http://localhost:3000/removeMember/${userid}`,
+                { headers: { "Authorization": token } });
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+    }
+}
+
+function hidepopup() {
+    document.getElementById("popup").style.display = 'none';
 }

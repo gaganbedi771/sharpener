@@ -1,0 +1,63 @@
+<button class="button" onclick="show('popup')">Button</button>
+
+<div class="popup" id="popup">
+  <ul>
+    <li>This is li element</li>
+  </ul>
+  
+  <button class="button" onclick="hide('popup')">Button</button>
+</div>
+
+</div>
+
+
+<!-- css -->
+
+.popup {
+    display: none;
+    position: fixed;
+    padding: 10px;
+    width: 280px;
+    left: 50%;
+    margin-left: -150px;
+    height: 180px;
+    top: 50%;
+    margin-top: -100px;
+    background: #FFF;
+    border: 3px solid #F04A49;
+    z-index: 20;
+  }
+  
+  #popup:after {
+    position: fixed;
+    content: "";
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: -2;
+  }
+  
+  #popup:before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #FFF;
+    z-index: -1;
+  }
+
+  <!-- js -->
+  $ = function(id) {
+    return document.getElementById(id);
+  }
+  
+  var show = function(id) {
+      $(id).style.display ='block';
+  }
+  var hide = function(id) {
+      $(id).style.display ='none';
+  }

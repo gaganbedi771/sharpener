@@ -18,6 +18,8 @@ const Group= sequelize.define("groups",{
     creator:{
         type:Sequelize.INTEGER,
     }
-})
+    
+}
+  )
 
 module.exports=Group;
