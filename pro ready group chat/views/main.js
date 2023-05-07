@@ -1,6 +1,14 @@
+const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+    // console.log(socket.id)
+
+})
+
 window.addEventListener("DOMContentLoaded", loadChat);
 
 async function loadChat() {
+
 
     const p1 = new Promise((resolve, reject) => {
         resolve(DOMloadChat(1));
@@ -11,7 +19,9 @@ async function loadChat() {
     })
 
     Promise.all([p1, p2])
-        .then()
+        .then(() => {
+            socket.emit("join-group", "1");
+        })
         .catch(err => {
             console.log(err);
         })
@@ -139,6 +149,7 @@ async function onGroupClick(e) {
                 { headers: { "Authorization": token } });
             localStorage.setItem("token", result.data.token);
 
+            socket.emit("join-group", groupId);
 
             DOMloadChat(groupId);
         }
@@ -183,9 +194,12 @@ async function sendMsg() {
     }
     try {
 
-        await axios.post("http://localhost:3000/send-msg", {
+        const result = await axios.post("http://localhost:3000/send-msg", {
             msg: msg
         }, { headers: { "Authorization": token } })
+
+        socket.emit("chat message", msg, result.data.groupId, result.data.name);
+        appendChatToPage(msg, result.data.name);
 
         document.getElementById("msg").value = "";
 
@@ -202,6 +216,11 @@ async function sendMsg() {
 //     DOMloadGroups()
 
 // }, 1000)
+
+socket.on("received message", (msg, groupId, name) => {
+    appendChatToPage(msg, name);
+
+})
 
 
 

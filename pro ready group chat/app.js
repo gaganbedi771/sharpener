@@ -16,6 +16,36 @@ const app = express();
 app.use(cors({
     origin: "*"
 }));
+
+const http = require("http").Server(app);
+const io = require("socket.io")(http, {
+    cors: {
+        origin: "*"
+    }
+});
+
+
+io.on("connection", socket => {
+    // console.log(socket.id,"connected");
+
+    socket.on("chat message", (msg, groupId, name) => {
+
+        // io.emit("received message",msg,groupId,name)
+        // socket.broadcast.emit(msg);
+        // console.log(msg,groupId,name);
+        socket.to(groupId).emit("received message", msg, groupId, name)
+
+    })
+    socket.on("join-group", gId => {
+        // console.log(gId, "joined")
+        socket.join(gId);
+    })
+})
+
+io.on("connection", socket => {
+    console.log(socket.id, "disconnected");
+})
+
 app.use(bodyparser.json());
 
 app.use(loginRoute);
@@ -49,7 +79,9 @@ sequelize.sync()
                     await Group.create({ groupname: "Public", creator: 1 })
                     await GroupMember.create({ groupGroupid: 1, userId: 1 })
                 }
-                app.listen(3000);
+                http.listen(3000);
+
+
             })
     })
     .catch(err => console.log(err));

@@ -9,13 +9,14 @@ const sequelize = require("../util/database");
 
 exports.send_msg = async (req, res, next) => {
     // console.log(req.user.dataValues.groupId);
+    const groupid=req.user.dataValues.groupId;
     try {
         await req.user.createChat({
             message: req.body.msg,
-            groupGroupid: req.user.dataValues.groupId
+            groupGroupid: groupid
         })
 
-        res.status(200).json({ message: "Msg Sent" });
+        res.status(200).json({ message: "Msg Sent", groupId:groupid, name:req.user.name});
 
     }
     catch (err) {
