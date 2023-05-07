@@ -9,7 +9,6 @@ window.addEventListener("DOMContentLoaded", loadChat);
 
 async function loadChat() {
 
-
     const p1 = new Promise((resolve, reject) => {
         resolve(DOMloadChat(1));
     })
@@ -128,18 +127,12 @@ async function DOMloadGroups() {
         })
         document.getElementById("groups").addEventListener("click", onGroupClick);
     }
-    else {
-        document.getElementById("groups").innerHTML = "<p>No groups found</p>";
-    }
 }
 
 async function onGroupClick(e) {
 
     if (e.target.classList.contains("open")) {
-        document.getElementById("chatapp").innerHTML = "";
-        document.getElementById("chatapp").innerHTML = e.target.parentNode.name;
-        document.getElementById("addmemberDiv").hidden = false;
-        document.getElementById("publicgroup").hidden = false;
+
 
         try {
             const groupId = e.target.parentNode.id;
@@ -148,6 +141,14 @@ async function onGroupClick(e) {
             const result = await axios.get(`http://localhost:3000/getGroupToken/${groupId}`,
                 { headers: { "Authorization": token } });
             localStorage.setItem("token", result.data.token);
+
+            if(result.data.isAdmin==true){
+                document.getElementById("addmemberInput").hidden=false;
+            }
+            document.getElementById("chatapp").innerHTML = "";
+            document.getElementById("chatapp").innerHTML = e.target.parentNode.name;
+            document.getElementById("viewMemberDiv").hidden = false;
+            document.getElementById("publicgroup").hidden = false;
 
             socket.emit("join-group", groupId);
 
@@ -249,7 +250,7 @@ async function addmember() {
     const member = document.getElementById("addmember").value;
     const token = localStorage.getItem("token");
     if (member) {
-        console.log(member);
+        
         try {
             const result = await axios.post("http://localhost:3000/addmember", {
                 member: member
@@ -353,6 +354,9 @@ async function memberClick(e) {
         try {
             const result = await axios.get(`http://localhost:3000/addAdmin/${userid}`,
                 { headers: { "Authorization": token } });
+
+                window.alert("Admin Added");
+                hidepopup();
         }
         catch (err) {
             console.log(err)
@@ -361,7 +365,6 @@ async function memberClick(e) {
 
     }
     else if (e.target.classList.contains("remove")) {
-        console.log("Remove")
 
         try {
             const result = await axios.get(`http://localhost:3000/removeMember/${userid}`,
@@ -376,4 +379,9 @@ async function memberClick(e) {
 
 function hidepopup() {
     document.getElementById("popup").style.display = 'none';
+}
+
+function logout(){
+    localStorage.clear();
+    window.location.href="signin.html"
 }

@@ -15,39 +15,35 @@
 </head>
 
 <body>
+    
     <div class="container mt-1 mr-3 w-70 p-3 float-right col-md-8 border border-dark rounded">
-
+        <button class=" float-left btn btn-sm btn-info" onclick="publicGroup()" id="publicgroup" hidden>Public
+            Group</button>
+            <button class="btn btn-dark float-right" onclick="logout()">Logout</button>
         <h1 class="text-center "><span class="badge badge-primary " id="chatapp">Public Chat</span></h1>
 
-
-        <div class=" text-center" id="addmemberDiv" hidden>
-            <button class=" float-left btn btn-sm btn-info" onclick="publicGroup()" id="publicgroup">Public
-                Group</button>
+        <div id="viewMemberDiv" hidden>
             <!-- popupDiv -->
-            <div class="float-right text-center">
+            <div class=" text-center">
+                <div id="addmemberInput" class="float-right" hidden>
+                    <input id="addmember" type="text" placeholder="Enter Email/phone">
+                    <br>
+                    <button class=" btn-sm btn-info" onclick="addmember()">Add Member</button>
+                </div>
 
-                <button class="btn btn-sm btn-info " onclick="showpopup()">View Members</button>
+                <button class="btn btn-sm btn-info float-left  " onclick="showpopup()">View Members</button>
                 <div class="popup" id="popup">
                     <ul id="viewmembers" class="float-left">
-                        
+
                     </ul>
 
                     <button class="btn btn-link" onclick="hidepopup()">close</button>
                 </div>
-                <div id="addmemberDiv" >
-                    <input id="addmember" type="text" placeholder="Enter Email/phone">
-                    <br>
-                    <button class=" float-right btn-sm  btn-info" onclick="addmember()">Add Member</button>
-                </div>
-
             </div>
         </div>
 
-
-
-
-
         <br>
+        
         <div class="text-center mb-5 p-5 " id="chats">
         </div>
 
@@ -87,9 +83,11 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    
 
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+        integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+        crossorigin="anonymous"></script>
 
 
     <script src="main.js">  </script>

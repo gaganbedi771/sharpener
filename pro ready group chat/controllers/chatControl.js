@@ -9,14 +9,14 @@ const sequelize = require("../util/database");
 
 exports.send_msg = async (req, res, next) => {
     // console.log(req.user.dataValues.groupId);
-    const groupid=req.user.dataValues.groupId;
+    const groupid = req.user.dataValues.groupId;
     try {
         await req.user.createChat({
             message: req.body.msg,
             groupGroupid: groupid
         })
 
-        res.status(200).json({ message: "Msg Sent", groupId:groupid, name:req.user.name});
+        res.status(200).json({ message: "Msg Sent", groupId: groupid, name: req.user.name });
 
     }
     catch (err) {
@@ -104,8 +104,43 @@ exports.getGroupToken = async (req, res, next) => {
     try {
         const { id, name } = req.user;
         const groupId = req.params.groupId || 1;
+        let boolAdmin = false;
+        if (groupId != 1) {
+            // const isMember=await GroupMember.findOne({where:{groupGroupid:groupId, userId:id}});
+            const p1 = new Promise((resolve, reject) => {
+                resolve(
+                    GroupMember.findOne({ where: { groupGroupid: groupId, userId: id } })
+                )
+            })
+            const p2 = new Promise((resolve, reject) => {
+                resolve(
+                    Admin.findOne({ where: { userId: id, groupId: groupId } })
+                )
+            })
 
-        res.status(200).json({ message: "success", token: userServices.generateWebToken(id, name, groupId) });
+            const result = await Promise.all([p1, p2])
+
+            // console.log(result[0],result[1]);
+            const [isMember, isAdmin] = result;
+
+            if (!isMember) {
+                res.status(400).json({ message: "Unauthorised" })
+            }
+
+
+            if (isAdmin) {
+                boolAdmin = true;
+            }
+
+            // if(!isMember){
+            //     res.status(400).json({message:"Unauthorised"});
+            // }
+
+            // const isAdmin= Admin.findOne({where:{userId:id,groupId:groupId}});
+
+        }
+
+        res.status(200).json({ message: "success", token: userServices.generateWebToken(id, name, groupId), isAdmin: boolAdmin });
     }
 
     catch (err) {
@@ -202,8 +237,8 @@ exports.removeMember = async (req, res, next) => {
         })
 
         const result = await Promise.all([ifIamAdmin, ifMemberIsAdmin]);
-       [ifIamAdmin,ifMemberIsAdmin]=result;
-       console.log(ifMemberIsAdmin);
+        [ifIamAdmin, ifMemberIsAdmin] = result;
+        console.log(ifMemberIsAdmin);
 
         if (req.user.id != userid && !ifIamAdmin) {
             return res.status(401).json({ message: "Unauthorised" })

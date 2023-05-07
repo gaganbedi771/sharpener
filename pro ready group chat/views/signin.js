@@ -7,6 +7,7 @@ async function onSignin(e) {
             emailorphone: emailorphone,
             password: password
         })
+        localStorage.clear();
         localStorage.setItem("token", result.data.token);
 
         window.alert(result.data.message);
@@ -21,7 +22,6 @@ async function onSignin(e) {
         else {
             window.location.href = "../views/signin.html"
         }
-
     }
 
 }

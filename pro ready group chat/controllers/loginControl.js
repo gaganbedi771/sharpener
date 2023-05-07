@@ -178,7 +178,7 @@ exports.updatepassword = async (req, res, next) => {
                 return res.sendStatus(500);
             }
             await User.update({ password: hashedPass }, { where: { id: userId } });
-            res.status(201).send('<html><a href="http://localhost:3000/signIn.html">Click To SignIn</a></html>');
+            res.status(201).send('<html><script>window.location.href = "../views/signin.html"</script></html>');
             res.end();
             // return res.status(201).json({ message: "Password Updated" });
             
