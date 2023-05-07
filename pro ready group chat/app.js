@@ -11,6 +11,7 @@ const User = require("./models/user");
 const Chat = require("./models/chat");
 const Group = require("./models/group");
 const GroupMember = require("./models/groupmember");
+const PassRequest = require("./models/passRequest");
 
 const app = express();
 app.use(cors({
@@ -66,6 +67,8 @@ User.belongsToMany(Group, { through: GroupMember });
 Chat.belongsTo(Group);
 Group.hasMany(Chat);
 
+PassRequest.belongsTo(User);
+User.hasMany(PassRequest);
 
 
 sequelize.sync()

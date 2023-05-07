@@ -53,15 +53,6 @@ exports.sendLink = async (req, res, next) => {
             }))
         })
 
-        // const p2=new Promise((resolve,reject)=>{
-
-        //     resolve( req.user.createpassRequest({
-        //         id: uuid,
-        //         isactive: "true"
-        //         // userId: user.dataValues.id
-        //     }) )
-        // }) 
-
         await Promise.all([p1, p2]);
         res.sendStatus(201);
     }
