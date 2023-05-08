@@ -12,6 +12,10 @@ const Chat = require("./models/chat");
 const Group = require("./models/group");
 const GroupMember = require("./models/groupmember");
 const PassRequest = require("./models/passRequest");
+const StoredFile = require("./models/files");
+
+const multer = require("multer");
+const handleMultiparts = multer();
 
 const app = express();
 app.use(cors({
@@ -69,6 +73,9 @@ Group.hasMany(Chat);
 
 PassRequest.belongsTo(User);
 User.hasMany(PassRequest);
+
+Group.hasMany(StoredFile);
+StoredFile.belongsTo(Group);
 
 
 sequelize.sync()

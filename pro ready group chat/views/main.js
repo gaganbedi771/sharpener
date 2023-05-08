@@ -142,8 +142,8 @@ async function onGroupClick(e) {
                 { headers: { "Authorization": token } });
             localStorage.setItem("token", result.data.token);
 
-            if(result.data.isAdmin==true){
-                document.getElementById("addmemberInput").hidden=false;
+            if (result.data.isAdmin == true) {
+                document.getElementById("addmemberInput").hidden = false;
             }
             document.getElementById("chatapp").innerHTML = "";
             document.getElementById("chatapp").innerHTML = e.target.parentNode.name;
@@ -181,7 +181,14 @@ function appendGroupToPage(groupname, groupid) {
 function appendChatToPage(message, name) {
     const p = document.createElement("p");
     p.className = "border "
-    p.appendChild(document.createTextNode(`${name}: ${message}`));
+    if(message.includes("https://groupchat771")){
+        message=`<a href="${message}">${name} sends a file</a>`
+    p.innerHTML=message;
+    }
+    else{
+        p.appendChild(document.createTextNode(`${name}: ${message}`));
+    }
+    
     document.getElementById("chats").appendChild(p);
 }
 
@@ -250,7 +257,7 @@ async function addmember() {
     const member = document.getElementById("addmember").value;
     const token = localStorage.getItem("token");
     if (member) {
-        
+
         try {
             const result = await axios.post("http://localhost:3000/addmember", {
                 member: member
@@ -355,8 +362,8 @@ async function memberClick(e) {
             const result = await axios.get(`http://localhost:3000/addAdmin/${userid}`,
                 { headers: { "Authorization": token } });
 
-                window.alert("Admin Added");
-                hidepopup();
+            window.alert("Admin Added");
+            hidepopup();
         }
         catch (err) {
             console.log(err)
@@ -381,7 +388,39 @@ function hidepopup() {
     document.getElementById("popup").style.display = 'none';
 }
 
-function logout(){
+function logout() {
     localStorage.clear();
-    window.location.href="signin.html"
+    window.location.href = "signin.html"
 }
+
+document.getElementById("inputFile").addEventListener("input", async (e) => {
+
+    try {
+
+        const file = e.target.files[0];
+        const token = localStorage.getItem("token");
+
+        const formData = new FormData()
+        formData.append('myfile', file);
+
+        const fileUrl=await axios.post("http://localhost:3000/sendfile", formData,
+        { headers: { "Authorization": token, "Content-Type":"multipart/form-data" } })
+        console.log(fileUrl.data.fileUrl);
+        appendChatToPage(fileUrl.data.fileUrl, fileUrl.data.name);
+        socket.emit("chat message", fileUrl.data.fileUrl, fileUrl.data.groupId, fileUrl.data.name);
+    }
+
+    catch (err) {
+        console.log(err);
+    }
+
+})
+
+
+// async function sendFile(){
+//     const file=document.getElementById("inputFile").value;
+//     const token=localStorage.getItem("token");
+
+//     await axios.post("http://localhost:3000/sendfile",{file:file},{headers:{"Authorization":token}})
+//     console.log(typeof (file));
+// }

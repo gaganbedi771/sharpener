@@ -47,9 +47,14 @@
         <div class="text-center mb-5 p-5 " id="chats">
         </div>
 
-        <div class=" align-items-center w-70 p-3  " style="background-color: #eee;">
-            <input class="input-sm col-md-11" type="text" id="msg" placeholder="Enter message" required>
-            <button class="btn btn-success btn-sm float-right" onclick="sendMsg()">Send</button>
+        <div class=" align-items-center w-70 p-3 " style="background-color: #eee;" >
+            
+            <input class="input-sm col-md-10" type="text" id="msg" placeholder="Enter message" required>
+            <button class="btn btn-success btn-sm  " onclick="sendMsg()">Send</button>
+            <label for="inputFile" class="btn btn-sm btn-info float-right">Send File</label>
+            <input id="inputFile" type="file" name="uploadFile"  hidden>
+            <!-- <button onclick="sendFile()"> Send File</button> -->
+       
         </div>
 
     </div>
