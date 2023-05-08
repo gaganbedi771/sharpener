@@ -2,7 +2,6 @@ const socket = io("http://localhost:3000");
 
 socket.on("connect", () => {
     // console.log(socket.id)
-
 })
 
 window.addEventListener("DOMContentLoaded", loadChat);
@@ -31,9 +30,7 @@ async function DOMloadChat(grpid) {
     const localChats = localStorage.getItem(`localChats${grpid}`);
     let lastMsgId;
     document.getElementById("chats").innerHTML = "";
-    // if(grpid!=0){
 
-    // }
     if (localChats == undefined) {
         const getAllChats = await axios.get("http://localhost:3000/getAllChats",
             { headers: { "Authorization": token } });
@@ -71,68 +68,79 @@ async function DOMloadChat(grpid) {
 }
 
 async function getUpdatedChats(grpid) {
-    let lastMsgId = localStorage.getItem(`lastMsgId${grpid}`) || 0;
-    let token = localStorage.getItem("token")
 
-    if (grpid == 1) {
-        const result = await axios.get(`http://localhost:3000/getGroupToken/${grpid}`,
+    try {
+
+        let lastMsgId = localStorage.getItem(`lastMsgId${grpid}`) || 0;
+        let token = localStorage.getItem("token")
+
+        if (grpid == 1) {
+            const result = await axios.get(`http://localhost:3000/getGroupToken/${grpid}`,
+                { headers: { "Authorization": token } });
+            token = result.data.token;
+        }
+
+        localStorage.setItem("token", token);
+
+        const updatedMsg = await axios.get(`http://localhost:3000/getUpdate/${lastMsgId}`,
             { headers: { "Authorization": token } });
-        token = result.data.token;
+
+        if (updatedMsg.data.updatedChat.length > 0) {
+            let UpdatedMsgId;
+            let arrlocalChats;
+            if (!localStorage.getItem(`localChats${grpid}`)) {
+                arrlocalChats = [];
+            }
+            else {
+                arrlocalChats = JSON.parse(localStorage.getItem(`localChats${grpid}`));
+            }
+
+            updatedMsg.data.updatedChat.forEach((item) => {
+                arrlocalChats.push(item);
+                UpdatedMsgId = item.id;
+                appendChatToPage(item.message, item.user.name);
+            })
+
+            localStorage.setItem(`lastMsgId${grpid}`, UpdatedMsgId);
+
+            const arrLen = arrlocalChats.length;
+            if (arrLen > 10) {
+                const stringifiedArr = JSON.stringify(arrlocalChats.slice(arrLen - 10, arrLen));
+                localStorage.setItem(`localChats${grpid}`, stringifiedArr);
+            }
+            else {
+                localStorage.setItem(`localChats${grpid}`, JSON.stringify(arrlocalChats));
+            }
+        }
     }
-
-    localStorage.setItem("token", token);
-
-    const updatedMsg = await axios.get(`http://localhost:3000/getUpdate/${lastMsgId}`,
-        { headers: { "Authorization": token } });
-
-    if (updatedMsg.data.updatedChat.length > 0) {
-        let UpdatedMsgId;
-        let arrlocalChats;
-        if (!localStorage.getItem(`localChats${grpid}`)) {
-            arrlocalChats = [];
-        }
-        else {
-            arrlocalChats = JSON.parse(localStorage.getItem(`localChats${grpid}`));
-        }
-
-        updatedMsg.data.updatedChat.forEach((item) => {
-            arrlocalChats.push(item);
-            UpdatedMsgId = item.id;
-            appendChatToPage(item.message, item.user.name);
-        })
-
-        localStorage.setItem(`lastMsgId${grpid}`, UpdatedMsgId);
-
-        const arrLen = arrlocalChats.length;
-        if (arrLen > 10) {
-            const stringifiedArr = JSON.stringify(arrlocalChats.slice(arrLen - 10, arrLen));
-            localStorage.setItem(`localChats${grpid}`, stringifiedArr);
-        }
-        else {
-            localStorage.setItem(`localChats${grpid}`, JSON.stringify(arrlocalChats));
-        }
+    catch (err) {
+        console.log(err);
     }
 }
 
 async function DOMloadGroups() {
-    const token = localStorage.getItem("token");
-    const getGroups = await axios.get("http://localhost:3000/getAllGroups",
-        { headers: { "Authorization": token } });
+    try {
+        const token = localStorage.getItem("token");
+        const getGroups = await axios.get("http://localhost:3000/getAllGroups",
+            { headers: { "Authorization": token } });
 
-    document.getElementById("groups").innerHTML = "";
+        document.getElementById("groups").innerHTML = "";
 
-    if (getGroups.data.allGroups.length > 0) {
-        getGroups.data.allGroups.forEach((item) => {
-            appendGroupToPage(item.groupname, item.groupid);
-        })
-        document.getElementById("groups").addEventListener("click", onGroupClick);
+        if (getGroups.data.allGroups.length > 0) {
+            getGroups.data.allGroups.forEach((item) => {
+                appendGroupToPage(item.groupname, item.groupid);
+            })
+            document.getElementById("groups").addEventListener("click", onGroupClick);
+        }
+    }
+    catch (err) {
+        console.log(err);
     }
 }
 
 async function onGroupClick(e) {
 
     if (e.target.classList.contains("open")) {
-
 
         try {
             const groupId = e.target.parentNode.id;
@@ -157,7 +165,6 @@ async function onGroupClick(e) {
         catch (err) {
             console.log(err);
         }
-
     }
 }
 
@@ -181,14 +188,16 @@ function appendGroupToPage(groupname, groupid) {
 function appendChatToPage(message, name) {
     const p = document.createElement("p");
     p.className = "border "
-    if(message.includes("https://groupchat771")){
-        message=`<a href="${message}">${name} sends a file</a>`
-    p.innerHTML=message;
+    if (message.includes("https://groupchat771")) {
+        p.innerHTML = `<picture>
+            <img src=${message} style="width:auto;height:70px;">
+            <a href="${message}">Download</a>
+        </picture>`
     }
-    else{
+    else {
         p.appendChild(document.createTextNode(`${name}: ${message}`));
     }
-    
+
     document.getElementById("chats").appendChild(p);
 }
 
@@ -219,15 +228,9 @@ async function sendMsg() {
 
 }
 
-// setInterval(() => {
-//     getUpdatedChats();
-//     DOMloadGroups()
-
-// }, 1000)
 
 socket.on("received message", (msg, groupId, name) => {
     appendChatToPage(msg, name);
-
 })
 
 
@@ -243,7 +246,6 @@ async function createGroup() {
         }
         const result = await axios.post("http://localhost:3000/createGroup", { groupName: groupName }, { headers: { "Authorization": token } });
 
-        console.log(result)
         const { groupid, groupname } = result.data.result;
 
         appendGroupToPage(groupname, groupid);
@@ -321,8 +323,6 @@ function appendMembersToPopup(member, adminSet, myId) {
     const li = document.createElement("li");
     li.id = member.id;
     li.appendChild(document.createTextNode(`${member.name} :`))
-    // li.className = "float-left"
-
 
     const btnAdmin = document.createElement("button");
     btnAdmin.className = "btn btn-sm btn-link admin";
@@ -403,8 +403,8 @@ document.getElementById("inputFile").addEventListener("input", async (e) => {
         const formData = new FormData()
         formData.append('myfile', file);
 
-        const fileUrl=await axios.post("http://localhost:3000/sendfile", formData,
-        { headers: { "Authorization": token, "Content-Type":"multipart/form-data" } })
+        const fileUrl = await axios.post("http://localhost:3000/sendfile", formData,
+            { headers: { "Authorization": token, "Content-Type": "multipart/form-data" } })
         console.log(fileUrl.data.fileUrl);
         appendChatToPage(fileUrl.data.fileUrl, fileUrl.data.name);
         socket.emit("chat message", fileUrl.data.fileUrl, fileUrl.data.groupId, fileUrl.data.name);
@@ -415,12 +415,3 @@ document.getElementById("inputFile").addEventListener("input", async (e) => {
     }
 
 })
-
-
-// async function sendFile(){
-//     const file=document.getElementById("inputFile").value;
-//     const token=localStorage.getItem("token");
-
-//     await axios.post("http://localhost:3000/sendfile",{file:file},{headers:{"Authorization":token}})
-//     console.log(typeof (file));
-// }

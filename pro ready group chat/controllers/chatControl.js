@@ -7,7 +7,7 @@ const { Sequelize, Op } = require("sequelize");
 const userServices = require("../services/userServices");
 const sequelize = require("../util/database");
 const S3Services = require("../services/s3service");
-const StoredFile=require("../models/files");
+const StoredFile = require("../models/files");
 
 
 exports.send_msg = async (req, res, next) => {
@@ -224,8 +224,6 @@ exports.removeMember = async (req, res, next) => {
     const groupid = req.user.dataValues.groupId;
     const t = await sequelize.transaction();
     try {
-        // const ifIamAdmin = await Admin.findOne({ where: { groupId: groupid, userId: req.user.id } });
-        // const ifMemberIsAdmin=await Admin.findOne({ where: { groupId: groupid, userId: userid } });
 
         let ifIamAdmin = new Promise((resolve, reject) => {
             resolve(
@@ -265,45 +263,35 @@ exports.removeMember = async (req, res, next) => {
 
 
 exports.sendFile = async (req, res, next) => {
-    const t=await sequelize.transaction();
+    const t = await sequelize.transaction();
     try {
-        
-      
 
-        const file=req.file.buffer;
-        console.log(file)
-        
-        // const stringifiedFile = JSON.stringify(file);
-        // const date = new Date();
+        const file = req.file.buffer;
+
         const filename = `${req.file.originalname}`;
         const fileUrl = await S3Services.uploadToS3(file, filename);
 
-
-        const p1=new Promise((resolve,reject)=>{
+        const p1 = new Promise((resolve, reject) => {
             resolve(
-                StoredFile.create({userid: req.user.id, url:fileUrl, groupGroupid:req.user.dataValues.groupId},
-                    {transaction:t})
+                StoredFile.create({ userid: req.user.id, url: fileUrl, groupGroupid: req.user.dataValues.groupId },
+                    { transaction: t })
             );
         })
 
         const p2 = new Promise((resolve, reject) => {
             resolve(
-                req.user.createChat({message: fileUrl,groupGroupid: req.user.dataValues.groupId},{transaction:t})
+                req.user.createChat({ message: fileUrl, groupGroupid: req.user.dataValues.groupId }, { transaction: t })
             )
         })
 
-        const result=await Promise.all([p1,p2])
+        const result = await Promise.all([p1, p2])
         await t.commit();
-        
-        // expensesList[0].push(expensesList[1]);
-    
-        // // console.log("fileUrl", fileUrl)
-        res.status(200).json({ fileUrl: fileUrl, groupId: req.user.dataValues.groupId, name: req.user.name});
+
+        res.status(200).json({ fileUrl: fileUrl, groupId: req.user.dataValues.groupId, name: req.user.name });
     }
     catch (err) {
         await t.rollback();
         console.log(err);
         res.status(500).json(err);
     }
-
 }
