@@ -13,6 +13,7 @@ const Group = require("./models/group");
 const GroupMember = require("./models/groupmember");
 const PassRequest = require("./models/passRequest");
 const StoredFile = require("./models/files");
+const Archive = require("./models/archived");
 
 const multer = require("multer");
 const handleMultiparts = multer();
@@ -31,18 +32,11 @@ const io = require("socket.io")(http, {
 
 
 io.on("connection", socket => {
-    // console.log(socket.id,"connected");
 
     socket.on("chat message", (msg, groupId, name) => {
-
-        // io.emit("received message",msg,groupId,name)
-        // socket.broadcast.emit(msg);
-        // console.log(msg,groupId,name);
         socket.to(groupId).emit("received message", msg, groupId, name)
-
     })
     socket.on("join-group", gId => {
-        // console.log(gId, "joined")
         socket.join(gId);
     })
 })
@@ -61,6 +55,18 @@ app.use(tokenRoute);
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, `views/${req.url}`))
 })
+
+
+var CronJob = require('cron').CronJob;
+var job = new CronJob(
+    '@daily',
+    async function () {
+        await sequelize.query("INSERT INTO archives SELECT * FROM chats")
+        await sequelize.query("DELETE FROM chats")
+    },
+    null,
+    true
+);
 
 Chat.belongsTo(User);
 User.hasMany(Chat);

@@ -8,23 +8,8 @@ const userServices = require("../services/userServices");
 const sequelize = require("../util/database");
 const S3Services = require("../services/s3service");
 const StoredFile = require("../models/files");
-const cron = require("cron");
-const Archive = require("../models/archived");
+// const cron = require("cron");
 
-const nodeCron = require("node-cron")
-nodeCron.schedule(
-    '@daily',
-     async function () {
-        console.log('CRON job has executed');
-        try {
-            await sequelize.query(`INSERT INTO archives SELECT * FROM chats`)
-             await sequelize.query(`DELETE FROM chats`)
-        }
-        catch (err) {
-            console.log(err);
-        }
-    }
-);
 
 
 
