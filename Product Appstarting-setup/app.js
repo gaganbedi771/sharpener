@@ -9,7 +9,7 @@ const shopRoutes = require('./routes/shop');
 
 // const sequelize = require("./util/database");
 // const Product = require("./models/product");
-// const User = require("./models/user");
+const User = require("./models/user");
 // const Cart = require("./models/cart");
 // const CartItem = require("./models/cart-item");
 
@@ -24,15 +24,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    // User.findByPk(1)
-    //     .then(user => {
-    //         req.user = user;
-    //         next();
-    //     })
-    //     .catch(err => {
-    //         console.log(err);
-    //     })
-    next();
+    User.findById("648234b2cf7b9663775d9002")
+        .then(user => {
+            req.user = user;
+            next();
+        })
+        .catch(err => {
+            console.log(err);
+        })
 })
 
 app.use('/admin', adminRoutes);
@@ -72,7 +71,7 @@ app.use(errorController.get404);
 //     .catch(err => console.log(err))
 
 mongoConnect(()=>{
-
+    
     app.listen(3000)
     // console.log(client)
 })
