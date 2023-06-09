@@ -23,7 +23,13 @@ exports.postAddProduct = (req, res, next) => {
 
   // const product=new Product(title,price,imageUrl,description, null, req.user._id);
 
-  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl })
+  const product = new Product({ 
+    title: title, 
+    price: price, 
+    description: description, 
+    imageUrl: imageUrl,
+    userId: req.user._id
+  })
   product.save()
     .then(result => {
       res.redirect('/admin/products')
@@ -87,7 +93,10 @@ exports.getProducts = (req, res, next) => {
   // Product.fetchAll()
   // req.user.getProducts()
   Product.find()
+  // .select("title price -_id")
+  // .populate("userId","name")
     .then((products) => {
+      
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',

@@ -24,16 +24,17 @@ app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use((req, res, next) => {
-//     User.findById("648234b2cf7b9663775d9002")
-//         .then(user => {
-//             req.user = new User(user.name, user.email, user.cart, user._id);
-//             next();
-//         })
-//         .catch(err => {
-//             console.log(err);
-//         })
-// })
+app.use((req, res, next) => {
+    User.findById("648359ad5bbb659ecbb6e43b")
+        .then(user => {
+            // req.user = new User(user.name, user.email, user.cart, user._id);
+            req.user = user;
+            next();
+        })
+        .catch(err => {
+            console.log(err);
+        })
+})
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
@@ -80,6 +81,21 @@ app.use(errorController.get404);
 mongoose.connect(process.env.MONGO_Connect)
     .then(result => {
         console.log("connected")
+        User.findOne()
+            .then(user => {
+                if (!user) {
+                    const user = new User({
+                        name: "xyz",
+                        email: "xyz@gmail.com",
+                        cart: {
+                            items: []
+                        }
+                    })
+                    user.save();
+                }
+            })
+
+
         app.listen(3000)
     })
     .catch(err => console.log(err));
