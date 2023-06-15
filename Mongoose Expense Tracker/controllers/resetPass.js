@@ -18,13 +18,12 @@ exports.sendLink = async (req, res, next) => {
     try {
         const uuid = uuidv4();
         const email = req.body.email;
-        // console.log(uuid);
-        const user = await User.findOne({ where: { email: email } });
+
+        const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(404).json({ message: "user doesn't exists" });
         }
-        req.user = user;
-        // console.log(req.user);
+
         const sender = {
             email: "gaganbedi771@gmail.com"
         }
@@ -45,12 +44,12 @@ exports.sendLink = async (req, res, next) => {
         })
 
         const p2 = new Promise((resolve, reject) => {
-
-            resolve(passRequest.create({
-                id: uuid,
-                isactive: "true",
-                userId: user.dataValues.id
-            }))
+            const newPassResetReq = new passRequest({
+                userId: user._id,
+                uuid: uuid,
+                isactive: "true"
+            })
+            resolve(newPassResetReq.save())
         })
 
         await Promise.all([p1, p2]);
@@ -66,12 +65,12 @@ exports.getLink = async (req, res, next) => {
     const uuid = req.params.uuid;
 
     try {
-        const authenticateLink = await passRequest.findOne({ where: { id: uuid, isactive: "true" } })
+        const authenticateLink = await passRequest.findOne({ uuid: uuid, isactive: "true" } )
         if (!authenticateLink) {
             return res.status(404).json({ message: "Generate Link again" });
         }
 
-        await passRequest.update({isactive:"false"},{where:{id:uuid,isactive:"true"}});
+        await passRequest.findOneAndUpdate({ uuid: uuid, isactive: "true" },{ isactive: "false" });
         res.status(201).send(`
         <html>
             <script>
@@ -100,18 +99,18 @@ exports.updatePassword = async (req, res, next) => {
     const { newpassword } = req.query;
     try {
 
-        const authenticateLink = await passRequest.findByPk(id);
+        const authenticateLink = await passRequest.findOne({uuid:id});
         if (!authenticateLink || !newpassword) {
             return res.status(400).json({ customMessage: "Bad parameters" });
         }
-        const userId = authenticateLink.dataValues.userId;
+        const userId = authenticateLink.userId;
 
         bcrypt.hash(newpassword, 10, async (err, hashedPass) => {
             if (err) {
                 console.log(err);
                 return res.sendStatus(500);
             }
-            await User.update({ password: hashedPass }, { where: { id: userId } });
+            await User.findByIdAndUpdate(userId,{ password: hashedPass });
             return res.status(201).json({ message: "Password Updated" });
         })
 

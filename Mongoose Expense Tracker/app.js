@@ -44,28 +44,12 @@ app.use((req,res)=>{
     
 })
 
-// User.hasMany(Expense);
-// Expense.belongsTo(User);
 
 // User.hasMany(Order);
 // Order.belongsTo(User);
 
-// passRequest.belongsTo(User);
-// User.hasMany(passRequest);
-
 // DownloadedExpense.belongsTo(User);
 // User.hasMany(DownloadedExpense);
-
-// findAll.showLeaderBoard();
-
-// sequelize.sync()
-//     // sequelize.sync({force:true})
-//     .then(result => {
-//         app.listen(2000);
-//     })
-//     .catch(err => {
-//         console.log(err);
-//     })
 
 mongoose.connect(process.env.MONGO_DB_API)
 .then(()=>{

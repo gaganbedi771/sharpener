@@ -5,71 +5,66 @@ const Order = require("../models/order");
 const DownloadedExpense = require("../models/downloadedExpense");
 const userServices = require("../services/userservices");
 const Razorpay = require("razorpay");
-require('dotenv').config();
 
 const S3Services = require("../services/s3services");
 
 exports.buyPremium = async (req, res, next) => {
+    try {
+        const rzp = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        })
 
-    const rzp = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    })
-
-    var options = {
-        amount: 3700,
-        currency: "INR"
-    }
-
-    const t = await sequelize.transaction();
-    rzp.orders.create(options, (err, order) => {
-        if (err) {
-            console.log(err);
-            throw new Error(JSON.stringify(err));
+        var options = {
+            amount: 3700,
+            currency: "INR"
         }
 
-        req.user.createOrder({ orderid: order.id, status: "PENDING" }, { transaction: t })
-            .then(async () => {
-                await t.commit();
-                return res.status(201).json({ order, key_id: rzp.key_id });
-            })
-            .catch(async err => {
-                await t.rollback();
+        rzp.orders.create(options,async (err, order) => {
+            if (err) {
                 console.log(err);
-                return res.status(403).json({ message: "Something wrong", error: err });
+                throw new Error(JSON.stringify(err));
+            }
+            const newOrder = new Order({
+                userId: req.user._id,
+                orderid: order.id,
+                status: "PENDING"
             })
-    })
+            await newOrder.save();
+            return res.status(201).json({ order, key_id: rzp.key_id });
+        }
+        )
+    }
+    catch (err) {
+
+        console.log(err);
+        return res.status(403).json({ message: "Something wrong", error: err });
+    }
 }
 
 exports.updatePremium = async (req, res, next) => {
-    const t = await sequelize.transaction();
+    
     try {
-        const id = req.user.dataValues.id;
-        const name = req.user.dataValues.name;
-
-        const order = await Order.findOne({ where: { orderid: req.body.order_id } });
-
-
         const p1 = new Promise((resolve, reject) => {
 
-            resolve(order.update({ paymentid: req.body.payment_id, status: "Success" }, { transaction: t }))
+            resolve(
+                Order.findOneAndUpdate({userId:req.user._id, orderid: req.body.order_id },{ paymentid: req.body.payment_id, status: "Success" }  )
+            )
         })
         const p2 = new Promise((resolve, reject) => {
 
-            resolve(req.user.update({ premium: "yes" }, { transaction: t }))
+            resolve(User.findByIdAndUpdate(req.user._id,{ premium: "yes" }))
         })
 
-        await Promise.all([p1, p2])
-
-        await t.commit();
-        return res.status(201).json({ message: "Tables Updated", token: userServices.generateAccessToken(id, name, "yes") })
+        const [updatedOrder,updatedUser]=await Promise.all([p1, p2]);
+        req.user=updatedUser;
+        return res.status(201).json({ message: "Tables Updated", token: userServices.generateAccessToken(req.user._id, req.user.name, "yes") })
 
     }
 
     catch (err) {
 
         console.log(err)
-        await t.rollback();
         res.status(500).json({ err: err });
     }
 }
@@ -77,8 +72,7 @@ exports.updatePremium = async (req, res, next) => {
 exports.updateFailure = async (req, res, next) => {
 
     try {
-        const order = await Order.findOne({ where: { orderid: req.body.order_id } })
-        await order.update({ status: "failed" });
+        await Order.findOneAndUpdate({ userId:req.user._id,orderid: req.body.order_id },{ status: "failed" });
         res.status(201).json({ message: "Table updated" });
     }
 
@@ -90,10 +84,7 @@ exports.updateFailure = async (req, res, next) => {
 
 exports.checkPremium = async (req, res, next) => {
     try {
-        const userId = req.user.dataValues.id;
-        const user = await User.findByPk(userId)
-
-        res.status(201).json({ message: user.dataValues.premium });
+        res.status(201).json({ message: req.user.premium });
     }
     catch (err) {
         console.log(err);
@@ -105,15 +96,11 @@ exports.showLeaderBoard = async (req, res, next) => {
 
     try {
 
-        let usersExpense = await User.findAll({
-            attributes: ["name", "totalExpense"],
-            order: [["totalExpense", "DESC"]]
-        });
-        // console.log(usersExpense);
+        let usersExpense = await User.find()
+        .select('name totalExpense -_id')
+        .sort({totalExpense: -1 })
 
         res.status(201).json(usersExpense);
-
-       
     }
     catch (err) {
         console.log(err);
@@ -136,7 +123,7 @@ exports.sendDownloadLink = async (req, res, next) => {
         const filename = `Expenses${req.user.id} ${date}.txt`;
         const fileUrl = await S3Services.uploadToS3(stringifiedExpenses, filename);
 
-        const p1=new Promise((resolve,reject)=>{
+        const p1 = new Promise((resolve, reject) => {
             resolve(req.user.getDownloadedExpenses());
         })
 
@@ -144,12 +131,12 @@ exports.sendDownloadLink = async (req, res, next) => {
             resolve(req.user.createDownloadedExpense({ link: fileUrl, date: date }))
         })
 
-        const expensesList=await Promise.all([p1,p2])
-        
-        expensesList[0].push(expensesList[1]);
-    
+        const expensesList = await Promise.all([p1, p2])
 
-        res.status(200).json({ fileUrl: fileUrl, list:expensesList[0] });
+        expensesList[0].push(expensesList[1]);
+
+
+        res.status(200).json({ fileUrl: fileUrl, list: expensesList[0] });
     }
     catch (err) {
         console.log(err);

@@ -272,7 +272,7 @@ function showLdrBrd() {
   LeaderBoard.insertBefore(p, boardItems);
   axios.get("http://localhost:2000/purchasePremium/showLeaderBoard", { headers: { "Authorization": token } })
     .then(result => {
-
+      console.log(result)
       result.data.forEach(data => {
         appendToLeaderBoard(data);
       })
@@ -289,7 +289,6 @@ function appendToLeaderBoard(obj) {
 function download() {
   axios.get("http://localhost:2000/download", { headers: { Authorization: token } })
     .then(result => {
-      console.log(result.data);
       let list = result.data.list;
 
       const p = document.createElement("h3");
