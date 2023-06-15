@@ -7,20 +7,19 @@ const expenseSchema = new Schema({
         required: true,
         ref: 'User'
     },
-    expense: [{
-        category: {
-            type: String,
-            required: true
-        },
-        description: {
-            type: String,
-            required: true
-        },
-        amount: {
-            type: Number,
-            required: true
-        },
-    }]
+    category: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true
+    }
+
 })
 
 // const Sequelize=require("sequelize");

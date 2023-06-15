@@ -69,9 +69,9 @@ app.use((req,res)=>{
 
 mongoose.connect(process.env.MONGO_DB_API)
 .then(()=>{
-    // app.listen(process.env.portConnect);
     console.log("listening");
-    app.listen(2000);
+    app.listen(process.env.portConnect);
+    
 })
 .catch(err=>{
     console.log(err);

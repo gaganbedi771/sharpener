@@ -4,7 +4,7 @@ const controllers = require("../controllers/controllers");
 const userAuthentication=require("../middleware/authenticate");
 
 //for DOM loading
-// router.get("/getAll", userAuthentication, controllers.getAll);
+router.get("/getAll", userAuthentication, controllers.getAll);
 
 //adding data to db
 router.post("/add-expense",userAuthentication, controllers.addExpense);
