@@ -53,6 +53,7 @@ app.use(tokenRoute);
 
 
 app.use((req, res) => {
+    console.log(req.url)
     res.sendFile(path.join(__dirname, `views/${req.url}`))
 })
 
@@ -96,8 +97,6 @@ sequelize.sync()
                     await GroupMember.create({ groupGroupid: 1, userId: 1 })
                 }
                 http.listen(3000);
-
-
             })
     })
     .catch(err => console.log(err));

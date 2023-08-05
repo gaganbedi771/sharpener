@@ -14,22 +14,22 @@ async function onSignup(e) {
         })
         window.alert(`User Account Created. Log In?`)
 
-         window.location.href=`../views/signin.html`;
+         window.location.href=`signin.html`;
     }
     catch (err) {
         console.log(err)
         console.log(err.response.data.message)
         if(err.response.status==409){
             window.alert(`${err.response.data.message}`)
-            window.location.href=`../views/signin.html`;
+            window.location.href=`signin.html`;
         }
         else if(err.response.status==400){
             window.alert(`${err.response.data.message}`)
-            window.location.href=`../views/signup.html`;
+            window.location.href=`signup.html`;
         }
         else{
             window.alert(`Something went wrong`);
-            window.location.href=`../views/signup.html`;
+            window.location.href=`signup.html`;
         }
         // console.log(err);
     }

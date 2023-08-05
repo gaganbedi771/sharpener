@@ -34,22 +34,11 @@ app.use(userRoutes);
 app.use(expenseRoutes);
 app.use(premiumRoutes);
 app.use(resetPassRoutes);
-// app.use(error404.error);
 
 app.use((req,res)=>{
     const url=req.url;
-    // console.log(url)
-    // res.sendFile(path.join(__dirname,`views/signIn.html`));
     res.sendFile(path.join(__dirname,`views/${req.url}`));
-    
 })
-
-
-// User.hasMany(Order);
-// Order.belongsTo(User);
-
-// DownloadedExpense.belongsTo(User);
-// User.hasMany(DownloadedExpense);
 
 mongoose.connect(process.env.MONGO_DB_API)
 .then(()=>{

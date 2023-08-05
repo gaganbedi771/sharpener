@@ -15,7 +15,7 @@ function premiumFeatures() {
   document.getElementById("ifPremium").append(ldrBoard);
   ldrBoard.addEventListener("click", showLdrBrd);
 
-  document.getElementById("downloadexpense").disabled = false
+  // document.getElementById("downloadexpense").disabled = false
 }
 
 window.addEventListener("DOMContentLoaded", async () => {

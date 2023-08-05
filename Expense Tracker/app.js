@@ -41,7 +41,7 @@ app.use(resetPassRoutes);
 
 app.use((req,res)=>{
     const url=req.url;
-    console.log(url)
+    // console.log(url)
     // res.sendFile(path.join(__dirname,`views/signIn.html`));
     res.sendFile(path.join(__dirname,`views/${req.url}`));
     
@@ -58,8 +58,6 @@ User.hasMany(passRequest);
 
 DownloadedExpense.belongsTo(User);
 User.hasMany(DownloadedExpense);
-
-// findAll.showLeaderBoard();
 
 sequelize.sync()
     // sequelize.sync({force:true})
