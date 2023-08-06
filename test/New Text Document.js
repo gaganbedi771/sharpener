@@ -25,13 +25,48 @@
 // }
 
 // fun();
+"use strict" 
+class Human {
 
-delay(6000);
+  fun = () => {
+    console.log(this);
+  };
 
-setTimeout (()=>{
+  fun2(){
+    console.log(this);
+  }
+}
 
-console.log("first")
+const per1 = new Human();
 
-},10000)
+per1.fun();
+per1.fun2();
 
-console.log("second");
+
+
+const obj = {
+  print: function() {
+    console.log(this)
+    const print2 = () => {
+      console.log(this)
+    }
+    print2()
+  }
+}
+
+obj.print()
+
+
+const obj4 = {
+  name: "obj4",
+  getThis() {
+    return this;
+  },
+};
+
+const obj5 = { name: "obj5" };
+console.log(obj4.getThis())
+obj5.getThis = obj4.getThis;
+console.log(obj5)
+console.log(obj5.getThis()); // { name: 'obj5', getThis: [Function: getThis] }
+
