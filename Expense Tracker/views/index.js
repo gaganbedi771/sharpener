@@ -9,15 +9,16 @@ function logout() {
 
 function premiumFeatures() {
   document.getElementById("premiumButton").remove();
-  document.getElementById("ifPremium").innerHTML = "You are a premium user ";
+  // document.getElementById("ifPremium").innerHTML = "You are a premium user ";
   const ldrBoard = document.createElement("button");
-  ldrBoard.className = "btn btn-success float-right";
+  // ldrBoard.className = "btn btn-success float-right";
   ldrBoard.id = "ldrBrdBtn";
   ldrBoard.appendChild(document.createTextNode("LeaderBoard"));
   document.getElementById("ifPremium").append(ldrBoard);
   ldrBoard.addEventListener("click", showLdrBrd);
 
-  document.getElementById("downloadexpense").disabled = false
+  document.getElementById("downloadexpense").disabled = false;
+  document.getElementById("previousFiles").disabled = false;
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
@@ -173,7 +174,6 @@ function onClick(e) {
 
 function onSubmit(e) {
   e.preventDefault();
-
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value;
   const amount = document.getElementById("amount").value;
@@ -230,8 +230,8 @@ function appendDataToPage(data) {
 
   let btnDel = document.createElement('button');
   let btnEdit = document.createElement('button');
-  btnDel.className = 'btn-delete';
-  btnEdit.className = 'btn-edit';
+  btnDel.className = 'btn-delete expense-button';
+  btnEdit.className = 'btn-edit expense-button';
   btnEdit.appendChild(document.createTextNode('Edit'));
   btnDel.appendChild(document.createTextNode('Delete'));
   li.append(btnEdit);
@@ -284,13 +284,18 @@ function buyPre(e) {
 
 function showLdrBrd() {
   // document.getElementById("hedding").innerHTML=""
-  const p = document.createElement("h3");
-  p.className = "text-center px-5 py-0 badge-secondary";
-  p.id="hedding";
-  p.appendChild(document.createTextNode("Leaderboard"))
+  // const p = document.createElement("h3");
+  // p.className = "text-center px-5 py-0 badge-secondary";
+  // p.id="hedding";
+  // p.appendChild(document.createTextNode("Leaderboard"))
   const LeaderBoard = document.getElementById("LeaderBoard");
   const boardItems = document.getElementById("boardItems");
-  LeaderBoard.insertBefore(p, boardItems);
+  boardItems.innerHTML="";
+  const leaderBoardDiv=document.getElementById("LeaderBoard-div");
+  leaderBoardDiv.style.display="block"
+  document.getElementById("leaderboardClose").addEventListener("click",function(){leaderBoardDiv.style.display="none"})
+  
+  // LeaderBoard.insertBefore(p, boardItems);
   axios.get("http://localhost:2000/purchasePremium/showLeaderBoard", { headers: { "Authorization": token } })
     .then(result => {
       //  console.log(result.data)
@@ -310,15 +315,39 @@ function appendToLeaderBoard(obj) {
 function download() {
   axios.get("http://localhost:2000/download", { headers: { Authorization: token } })
     .then(result => {
+
       console.log(result.data);
+      
+      const a = document.createElement("a");
+      a.href = result.data.fileUrl;
+      a.download = "myexpense.csv";
+      a.click();
+    })
+    .catch(err => {
+      console.log(err);
+      throw new Error(err);
+    })
+}
+
+function previousFiles() {
+  axios.get("http://localhost:2000/download", { headers: { Authorization: token } })
+    .then(result => {
+      
+      console.log(result.data);
+      
+      const downloadedFilesdiv=document.getElementById("downloadedFiles-div");
+      downloadedFilesdiv.style.display="block";
+      downloadedFilesdiv.addEventListener("click",function(){downloadedFilesdiv.style.display="none"})
+
       let list = result.data.list;
 
-      const p = document.createElement("h3");
-      p.className = "text-center px-5 py-0 badge-secondary"
-      p.appendChild(document.createTextNode("Previous Generated Files"))
-      const downloadedFiles = document.getElementById("downloadedFiles");
-      const filesList = document.getElementById("filesList");
-      downloadedFiles.insertBefore(p, filesList);
+      // const p = document.createElement("h3");
+      // p.className = "text-center px-5 py-0 badge-secondary"
+      // p.appendChild(document.createTextNode("Previous Generated Files"))
+      // const downloadedFiles = document.getElementById("downloadedFiles");
+      // const filesList = document.getElementById("filesList");
+    
+      // downloadedFiles.insertBefore(p, filesList);
 
       list.forEach(item => {
         console.log(item)
@@ -326,10 +355,7 @@ function download() {
         li.innerHTML = `<a href=${item.link}>Created at ${item.date}</a>`
         document.getElementById("filesList").appendChild(li);
       })
-      const a = document.createElement("a");
-      a.href = result.data.fileUrl;
-      a.download = "myexpense.csv";
-      a.click();
+  
     })
     .catch(err => {
       console.log(err);

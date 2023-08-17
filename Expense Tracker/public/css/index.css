@@ -1,0 +1,132 @@
+body {
+    background-color: aliceblue;
+  }
+
+  .left-div{
+    float: left;
+    margin: 10px;
+    width: 50%;
+  }
+
+  .right-div{
+    float: right;
+    margin: 10px;
+    margin-top: 0px;
+    width: 45%;
+  }
+
+  .pagination-input{
+    position: absolute;
+    bottom:10px;
+    right:10px;
+  }
+
+  .pagesNumber-div{
+    position: absolute;
+    bottom: 10px;
+    left: 40%;
+    
+  }
+.expenseItems-div{
+    
+    height: 280px;
+    overflow: auto;
+    margin: 10px;
+}
+
+  .myexpense-div{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    text-align: center;
+    margin: 10px 10px 10px 10px;
+    border: 3px solid brown;
+    border-radius: 20px;
+    background-color: rgb(243, 247, 226);
+    height:400px ;
+    
+    position: relative;
+  }
+  .appDiv {
+    color: teal;
+    text-align: center;
+    border-bottom: 1px dotted black;
+    margin: 10px;
+    border: 3px solid brown;
+    border-radius: 20px;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  }
+  .menu-div{
+    float: right;
+    margin: 4px;
+    margin-bottom: 0px;
+  }
+  .main-div {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    text-align: center;
+    margin: 20px 10px 10px 10px;
+
+    border: 3px solid brown;
+    border-radius: 20px;
+    background-color: rgb(243, 247, 226);
+    height: 400px;
+    position: relative;
+  }
+  .leaderboardClose-div{
+    position: absolute;
+    top: 3px;
+    right: 10px;
+  }
+  .menu-button{
+    float: right;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0px 10px 3px 0px;
+    font-size: 13px;
+    
+  }
+
+  .button-logout{
+    float: right;
+  }
+
+  .button-buy-pre{
+    float: left;
+  }
+  .button-leaderBoard{
+    float: right;
+  }
+  
+ 
+  
+  .form-div {
+    padding: 30px;
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  .form-element {
+    margin: 0px 0px 20px 0px;
+  }
+  
+  .button-submit {
+    text-align: center;
+  }
+  
+  .forgetpass-links-element {
+    float: left;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  }
+  
+  .signUp-links-element {
+    float: right;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  }
+  
+  a {
+    color: rgb(192, 125, 136);
+  }
+  
+  .expense-button{
+    border-radius: 30%;
+    margin: 3px;
+    font-size: 12px;
+  }

@@ -32,6 +32,7 @@ app.use(cors());
 
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({ extended: false }))
+app.use(express.static(path.join(__dirname,"public")));
 
 app.use(userRoutes);
 app.use(expenseRoutes);

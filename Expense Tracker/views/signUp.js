@@ -3,7 +3,7 @@ function onSignup(e) {
     const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
-console.log("running")
+
     axios.post("http://localhost:2000/signup", {
         name: name,
         email: email,
@@ -12,16 +12,18 @@ console.log("running")
         .then(result => {
 
             document.body.innerHTML += `<div style="color:red"> Success </div>`
+            alert("Success! Redirect to SignIn page ?")
+            window.location.href="signIn.html"
 
 
         })
         .catch(err => {
 
             if (err.response.data.customMessage) {
-                document.body.innerHTML += `<div style="color:red"> ${err.response.data.customMessage}</div>`
+                alert(err.response.data.customMessage);
             }
             else {
-                document.body.innerHTML += `<div style="color:red"> Failed to signUp </div>`
+                alert("Failed to signUp ");
             }
 
             throw new Error("Failed to signUp");
