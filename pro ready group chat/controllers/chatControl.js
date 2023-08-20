@@ -44,7 +44,7 @@ exports.getAllChats = async (req, res, next) => {
             }],
             group: ["id"]
         });
-        res.status(200).json({ message: "Success", allChat: allChat });
+        res.status(200).json({ message: "Success", allChat: allChat, myId:req.user.id });
     }
     catch (err) {
         console.log(err);

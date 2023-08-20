@@ -35,10 +35,12 @@ async function DOMloadChat(grpid) {
         const getAllChats = await axios.get("http://localhost:3000/getAllChats",
             { headers: { "Authorization": token } });
         const arrLen = getAllChats.data.allChat.length;
-
+        console.log(getAllChats);
         if (arrLen < 1) {
             return
         }
+        const myId= getAllChats.data.myId;
+
         getAllChats.data.allChat.forEach((item) => {
             lastMsgId = item.id;
             appendChatToPage(item.message, item.user.name);
@@ -155,8 +157,11 @@ async function onGroupClick(e) {
             }
             document.getElementById("chatapp").innerHTML = "";
             document.getElementById("chatapp").innerHTML = e.target.parentNode.name;
-            document.getElementById("viewMemberDiv").hidden = false;
-            document.getElementById("publicgroup").hidden = false;
+            // document.getElementById("viewMemberDiv").hidden = false;
+            document.getElementById("viewMemberBtn").disabled = false;
+            document.getElementById("addmember").disabled = false;
+            document.getElementById("addMemberBtn").disabled = false;
+            document.getElementById("publicgroup").disabled = false;
 
             socket.emit("join-group", groupId);
 
@@ -186,19 +191,31 @@ function appendGroupToPage(groupname, groupid) {
 
 
 function appendChatToPage(message, name) {
+    const div=document.createElement("div");
+    // if(senderId==myId){
+        // div.className="text-right"
+    // }
+    // else{
+        // div.className="text-left"
+    // }
+    div.style.backgroundColor="white"
     const p = document.createElement("p");
-    p.className = "border "
+    // console.log(senderId,myId,name)
+   
+    p.className = "border p-3 "
+    
     if (message.includes("https://groupchat771")) {
-        p.innerHTML = `<picture>
+        p.innerHTML = `<p></p><picture>
             <img src=${message} style="width:auto;height:70px;">
-            <a href="${message}">Download</a>
+            <a href="${message}">${name}: sends media</a>
         </picture>`
     }
     else {
         p.appendChild(document.createTextNode(`${name}: ${message}`));
     }
+    div.appendChild(p);
 
-    document.getElementById("chats").appendChild(p);
+    document.getElementById("chats").appendChild(div);
 }
 
 async function sendMsg() {
@@ -284,7 +301,7 @@ async function publicGroup() {
         const result = await axios.get("http://localhost:3000/getPublicToken",
             { headers: { "Authorization": token } });
         localStorage.setItem("token", result.data.token);
-        window.location.href = "../views/main.html"
+        window.location.href = "main.html"
     }
     catch (err) {
         console.log(err);

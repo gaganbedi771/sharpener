@@ -46,6 +46,7 @@ io.on("connection", socket => {
 })
 
 app.use(bodyparser.json());
+app.use(express.static(path.join(__dirname,"public")));
 
 app.use(loginRoute);
 app.use(chatRoute);

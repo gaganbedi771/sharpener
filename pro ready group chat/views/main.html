@@ -1,101 +1,153 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
 
     <title>Login</title>
-    <link rel="stylesheet" href="popup.css">
-</head>
+    <link rel="stylesheet" href="/css/popup.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
 
-<body>
-    
-    <div class="container mt-1 mr-3 w-70 p-3 float-right col-md-8 border border-dark rounded">
-        <button class=" float-left btn btn-sm btn-info" onclick="publicGroup()" id="publicgroup" hidden>Public
-            Group</button>
-            <button class="btn btn-dark float-right" onclick="logout()">Logout</button>
-        <h1 class="text-center "><span class="badge badge-primary " id="chatapp">Public Chat</span></h1>
+  <body>
+    <div class="app-div">
+      <h1>Chat App</h1>
 
-        <div id="viewMemberDiv" hidden>
-            <!-- popupDiv -->
-            <div class=" text-center">
-                <div id="addmemberInput" class="float-right" hidden>
-                    <input id="addmember" type="text" placeholder="Enter Email/phone">
-                    <br>
-                    <button class=" btn-sm btn-info" onclick="addmember()">Add Member</button>
-                </div>
-
-                <button class="btn btn-sm btn-info float-left  " onclick="showpopup()">View Members</button>
-                <div class="popup" id="popup">
-                    <ul id="viewmembers" class="float-left">
-
-                    </ul>
-
-                    <button class="btn btn-link" onclick="hidepopup()">close</button>
-                </div>
-            </div>
+      <div class="menu-div">
+        <div class="menu-button">
+          <button onclick="logout()">Logout</button>
         </div>
 
-        <br>
-        
-        <div class="text-center mb-5 p-5 " id="chats">
+        <div class="menu-button">
+          <button onclick="publicGroup()" id="publicgroup" disabled>
+            Public Group
+          </button>
         </div>
 
-        <div class=" align-items-center w-70 p-3 " style="background-color: #eee;" >
+        <div class="menu-button">
+          <button onclick="showpopup()" id="viewMemberBtn" disabled>
+            View Members
+          </button>
+        </div>
+
+        <div class="popup" id="popup">
+          <ul id="viewmembers" class="float-left"></ul>
+          <button class="btn btn-link" onclick="hidepopup()">close</button>
+        </div>
+
+        <div id="addmemberInput" class="menu-button">
+          <input
+            id="addmember"
+            type="text"
+            placeholder="Enter Email/phone"
+            required
+            disabled
+          />
+
+          <button onclick="addmember()" id="addMemberBtn" disabled>
+            Add Member
+          </button>
+        </div>
+      </div>
+
+      <div class="left-div">
+        <div class="main-div">
+          <h3>My Groups</h3>
+
+          <div>
+            <input
+              style="text-align: center"
+              type="text"
+              id="groupName"
+              placeholder="Enter Group Name"
+              required
+            />
+            <button onclick="createGroup()">Create Group</button>
+          </div>
+
+          <div class="groupList-div">
+            <ul id="groups"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-div">
+        <div class="main-div">
+          <h3 class="text-center" id="chatapp">Public Group</h3>
+
+          <div class="messages-div" id="chats">
             
-            <input class="input-sm col-md-10" type="text" id="msg" placeholder="Enter message" required>
-            <button class="btn btn-success btn-sm  " onclick="sendMsg()">Send</button>
-            <label for="inputFile" class="btn btn-sm btn-info float-right">Send File</label>
-            <input id="inputFile" type="file" name="uploadFile"  hidden>
-            <!-- <button onclick="sendFile()"> Send File</button> -->
-       
+          </div>
+
+          <div class="writeMessage-div">
+            <input
+              class="float-left"
+              style="width: 82%; margin: 0 5px 7px 10px; "
+              type="text"
+              id="msg"
+              placeholder="Enter message"
+              required
+            />
+
+            <button
+            class="btn btn-success btn-sm float-left"
+            style="margin: 0 5px 7px 5px"
+            ;
+            onclick="sendMsg()"
+          >
+            Send
+          </button>
+          
+            <label
+              for="inputFile"
+              class="btn btn-sm btn-info float-left"
+              style="margin: 0 5px 7px 5px"
+              >Send File</label
+            >
+            <input id="inputFile" type="file" name="uploadFile" hidden />
+          
+          </div>
         </div>
-
+      </div>
     </div>
-    <!--  -->
-    <div class="container w-25 p-3 mt-1 ml-3 float-left col-md-8 border border-dark rounded">
-
-        <h1 class="text-center"><span class="badge badge-secondary ">Groups</span></h1>
-
-        <input class="float-left" type="text" id="groupName" placeholder="Enter Group Name" required>
-        <button class="float-right btn btn-sm btn-success" onclick="createGroup()">Create Group</button>
-        <br>
-        <div>
-            <ul id="groups">
-            </ul>
-        </div>
-
-    </div>
-
-
-
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
+    <script
+      src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+      integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+      crossorigin="anonymous"
+    ></script>
 
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
-        integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
-        crossorigin="anonymous"></script>
-
-
-    <script src="main.js">  </script>
-</body>
-
+    <script src="main.js"></script>
+  </body>
 </html>
