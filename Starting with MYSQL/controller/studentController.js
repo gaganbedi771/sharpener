@@ -1,94 +1,147 @@
 const db = require("../utils/db_connection");
+const Student = require("../models/students");
 
-exports.addStudent = (req, res) => {
+exports.addStudent = async (req, res) => {
   console.log("Add student controller called");
-  const { name, email, age } = req.body;
 
-  const query = `insert into students (name,email,age) values (?,?,?)`;
+  try {
+    const { name, email, age } = req.body;
+    const student = await Student.create({ name, email, age });
+    res.status(201).send(student);
+  } catch (error) {
+    console.log(error);
+  }
 
-  db.execute(query, [name, email, age], (err, result) => {
-    if (err) {
-      console.log(err);
-      db.end();
-      return res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong");
-      return res.send("Something wrong at the backend");
-    }
-    res.send("Entry added");
-  });
+  // const query = `insert into students (name,email,age) values (?,?,?)`;
+  //
+  // db.execute(query, [name, email, age], (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //     db.end();
+  //     return res.send(err);
+  //   } else if (result.affectedRows == 0) {
+  //     console.log("Something went wrong");
+  //     return res.send("Something wrong at the backend");
+  //   }
+  // });
 };
 
-exports.getAllStudents = (req, res) => {
+exports.getAllStudents = async (req, res) => {
   console.log("get all students controller called");
 
-  const query = `select * from students`;
-
-  db.execute(query, (err, result) => {
-    if (err) {
-      console.log(err);
-      db.end();
-      return res.send(err);
+  try {
+    const students = await Student.findAll();
+    if (!students) {
+      return res.send("No students found");
     }
-    res.send(result);
-  });
+    res.send(students);
+  } catch (error) {
+    console.log(error);
+  }
+
+  // const query = `select * from students`;
+
+  // db.execute(query, (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //     db.end();
+  //     return res.send(err);
+  //   }
+  //   res.send(result);
+  // });
 };
 
-exports.getStudentById = (req, res) => {
+exports.getStudentById = async (req, res) => {
   console.log("get student by id controller called");
 
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
+    const student = await Student.findByPk(id);
 
-  const query = `select * from students where id=?`;
-
-  db.execute(query, [id], (err, result) => {
-    if (err) {
-      console.log(err);
-      db.end();
-      return res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong");
-      return res.send("Something went wrong");
+    if (!student) {
+      return res.send("No record found");
     }
-    res.send(result);
-  });
+    res.send(student);
+  } catch (error) {
+    console.log(error);
+  }
+
+  // const query = `select * from students where id=?`;
+
+  // db.execute(query, [id], (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //     db.end();
+  //     return res.send(err);
+  //   } else if (result.affectedRows == 0) {
+  //     console.log("Something went wrong");
+  //     return res.send("Something went wrong");
+  //   }
+  //   res.send(result);
+  // });
 };
 
-exports.updateStudentById = (req, res) => {
+exports.updateStudentById = async (req, res) => {
   console.log("update student controller called");
-  const { name, email, age } = req.body;
-  const { id } = req.params;
 
-  const query = `update students set name=?, email=?, age=? where id=?  `;
+  try {
+    const { name, email, age } = req.body;
+    const { id } = req.params;
 
-  db.execute(query, [name, email, age, id], (err, result) => {
-    if (err) {
-      console.log(err);
-      db.end();
-      return res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong");
-      return res.send("Something wrong at the backend");
+    const student = await Student.findByPk(id);
+
+    if (!student) {
+      return res.status(404).send("User not found");
     }
-    res.send("Updated");
-  });
+    student.name = name ? name : student.name;
+    student.email = email ? email : student.email;
+    student.age = age ? age : student.age;
+    await student.save();
+    res.send(student);
+  } catch (error) {
+    console.log(error);
+  }
+
+  // const query = `update students set name=?, email=?, age=? where id=?  `;
+
+  // db.execute(query, [name, email, age, id], (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //     db.end();
+  //     return res.send(err);
+  //   } else if (result.affectedRows == 0) {
+  //     console.log("Something went wrong");
+  //     return res.send("Something wrong at the backend");
+  //   }
+  //   res.send("Updated");
+  // });
 };
 
-exports.deleteStudentById = (req, res) => {
+exports.deleteStudentById = async (req, res) => {
   console.log("delete student controller called");
-  const { id } = req.params;
 
-  const query = `delete from students where id=?`;
-
-  db.execute(query, [id], (err, result) => {
-    if (err) {
-      console.log(err);
-      db.end();
-      res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong");
-      res.send("Something wrong at the backend");
+  try {
+    const { id } = req.params;
+    const student = await Student.destroy({ where: { id } });
+    if (!student) {
+      return res.status(404).send("Not found");
     }
     res.send("Deleted");
-  });
+  } catch (error) {
+    console.log(error);
+  }
+
+  // const query = `delete from students where id=?`;
+
+  // db.execute(query, [id], (err, result) => {
+  //   if (err) {
+  //     console.log(err);
+  //     db.end();
+  //     res.send(err);
+  //   } else if (result.affectedRows == 0) {
+  //     console.log("Something went wrong");
+  //     res.send("Something wrong at the backend");
+  //   }
+  //   res.send("Deleted");
+  // });
 };

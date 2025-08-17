@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.use("/student", studentRoute);
 
-db.sync({ force: true })
+db.sync({ force: false })
   .then(() => {
     app.listen(3000, (err) => {
       if (err) {
