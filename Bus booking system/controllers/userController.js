@@ -1,30 +1,27 @@
 const db = require("../utils/db_connection");
+const { User } = require("../models/index");
 
-exports.addUser = (req, res) => {
-  const { name, email } = req.body;
-
-  const query = `insert into user (name,email) values (?,?)`;
-
-  db.execute(query, [name, email], (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong at server side");
-      res.send("Something went wrong at server side");
+exports.addUser = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const user = await User.create({ name, email });
+    if (!user) {
+      return res.send("Error at server end");
     }
-    res.send("User added");
-  });
+    res.send(user);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.getAllUsers = (req, res) => {
-  const query = `select * from user`;
-
-  db.execute(query, (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send(err);
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll();
+    if (!users) {
+      return res.send("No user found");
     }
-    res.send(result);
-  });
+    res.send(users);
+  } catch (error) {
+    console.log(error);
+  }
 };

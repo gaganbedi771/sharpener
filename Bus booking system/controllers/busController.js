@@ -1,35 +1,34 @@
 const db = require("../utils/db_connection");
+const { Op } = require("sequelize");
+const { Bus } = require("../models/index");
 
-exports.addbus = (req, res) => {
-  const { busNumber, totalSeats, availableSeats } = req.body;
+exports.addbus = async (req, res) => {
+  try {
+    const { busNumber, totalSeats, availableSeats } = req.body;
 
-  const query = `insert into bus (busNumber,totalSeats,availableSeats) values (?,?,?)`;
-
-  db.execute(query, [busNumber, totalSeats, availableSeats], (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong at server side");
-      res.send("Something went wrong at server side");
+    const bus = await Bus.create({ busNumber, totalSeats, availableSeats });
+    if (!bus) {
+      return res.send("Error at server end");
     }
-    res.send("Bus added");
-  });
+    res.send(bus);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.getBusesWithAvailableSeats = (req, res) => {
-  const requiredSeats = req.params.seats;
+exports.getBusesWithAvailableSeats = async (req, res) => {
+  try {
+    const requiredSeats = req.params.seats;
 
-  const query = `select * from bus where availableSeats >= ? `;
+    const busesWithAvailableSeats = await Bus.findAll({
+      where: { availableSeats: { [Op.gte]: requiredSeats } },
+    });
 
-  db.execute(query, [requiredSeats], (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send(err);
-    } else if (result.affectedRows == 0) {
-      console.log("Something went wrong at server side");
-      res.send("Something went wrong at server side");
+    if (!busesWithAvailableSeats) {
+      return res.send("No busses found");
     }
-    res.send(result);
-  });
+    res.send(busesWithAvailableSeats);
+  } catch (error) {
+    console.log(error);
+  }
 };
