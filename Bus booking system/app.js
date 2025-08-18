@@ -9,8 +9,8 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/users", userRoutes);
-app.use("/buses", busRoutes);
+app.use("/user", userRoutes);
+app.use("/bus", busRoutes);
 
 db.sync({ force: false })
   .then(() => {

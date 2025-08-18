@@ -1,6 +1,6 @@
 const db = require("../utils/db_connection");
 const { Op } = require("sequelize");
-const { Bus } = require("../models/index");
+const { Bus, Booking } = require("../models/index");
 
 exports.addbus = async (req, res) => {
   try {
@@ -28,6 +28,16 @@ exports.getBusesWithAvailableSeats = async (req, res) => {
       return res.send("No busses found");
     }
     res.send(busesWithAvailableSeats);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.getBookingsByBus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const bookingsByBus = await Bus.findByPk(id, { include: Booking });
+    res.json(bookingsByBus);
   } catch (error) {
     console.log(error);
   }
