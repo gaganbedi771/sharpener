@@ -1,5 +1,5 @@
 const db = require("../utils/db_connection");
-const Student = require("../models/students");
+const { Student, Post } = require("../models/index");
 
 exports.addStudent = async (req, res) => {
   console.log("Add student controller called");
@@ -144,4 +144,28 @@ exports.deleteStudentById = async (req, res) => {
   //   }
   //   res.send("Deleted");
   // });
+};
+
+exports.getAllPostsByStudentId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const posts = await Post.findAll({ where: { studentId: id } });
+    if (!posts) {
+      return res.json({ success: true, message: "No Posts Found" });
+    }
+    res.json({ success: true, message: posts });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.addPost = async (req, res) => {
+  try {
+    const { name, email, age, message } = req.body;
+    const student = await Student.create({ name, email, age });
+    const post = await Post.create({ message, studentId: student.id });
+    res.json({student,post});
+  } catch (error) {
+    console.log(error);
+  }
 };

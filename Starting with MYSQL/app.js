@@ -1,7 +1,7 @@
 const express = require("express");
 const db = require("./utils/db_connection");
 const studentRoute = require("./routes/studentRoute");
-const student = require("./models/students");
+require("./models/index");
 
 const app = express();
 app.use(express.json());
