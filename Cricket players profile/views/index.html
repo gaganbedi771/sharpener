@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <header>
+    <h1>Player Information Tracker</h1>
+  </header>
+
+  <section class="container">
+
+    <!-- Search Player -->
+    <div id="search-container">
+      <input type="text" id="searchInput" placeholder="Search Player by Name">
+      <button id="searchBtn" class="btn">Search</button>
+    </div>
+
+    <!-- Player Form -->
+    <form id="player-form">
+      <h1>Add / Update Player</h1>
+      <div class="msg"></div>
+
+      <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+      </div>
+
+      <div>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob">
+      </div>
+
+      <div>
+        <label for="photo">Photo URL:</label>
+        <input type="text" id="photo" name="photo">
+      </div>
+
+      <div>
+        <label for="birthplace">Birthplace:</label>
+        <input type="text" id="birthplace" name="birthplace">
+      </div>
+
+      <div>
+        <label for="career">Career Information:</label>
+        <textarea id="career" name="career"></textarea>
+      </div>
+
+      <div>
+        <label for="matches">Matches:</label>
+        <input type="number" id="matches" name="matches">
+      </div>
+
+      <div>
+        <label for="score">Score:</label>
+        <input type="number" id="score" name="score">
+      </div>
+
+      <div>
+        <label for="fifties">Fifties:</label>
+        <input type="number" id="fifties" name="fifties">
+      </div>
+
+      <div>
+        <label for="centuries">Centuries:</label>
+        <input type="number" id="centuries" name="centuries">
+      </div>
+
+      <div>
+        <label for="wickets">Wickets:</label>
+        <input type="number" id="wickets" name="wickets">
+      </div>
+
+      <div>
+        <label for="average">Average:</label>
+        <input type="number" id="average" name="average" step="0.01">
+      </div>
+
+      <input type="hidden" id="playerId" value="">
+      <input id='submitbtn' class="btn" type="submit" value="Submit">
+    </form>
+
+    <!-- Display Players -->
+    <div id="players"></div>
+
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+  <script src="js/index.js"></script>
+
+</body>
+</html>

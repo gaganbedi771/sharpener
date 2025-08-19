@@ -1,0 +1,115 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  background: #fafafa;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+.container {
+  margin: auto;
+  width: 700px;
+  overflow: auto;
+  padding: 2rem;
+}
+
+#player-form {
+  padding: 2rem;
+  background: #f4f4f4;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+#player-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+#player-form input[type='text'],
+#player-form input[type='number'],
+#player-form input[type='date'],
+#player-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  min-height: 70px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 15px;
+  border: 0;
+  background: #333;
+  color: #fff;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #444;
+}
+
+#search-container {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+#searchInput {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Player Card */
+.player-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.player-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.player-details {
+  flex: 1;
+}
+
+.player-details h2 {
+  margin-bottom: 10px;
+}
+
+.player-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
