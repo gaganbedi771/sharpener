@@ -2,7 +2,6 @@ let form = document.getElementById("player-form");
 
 form.addEventListener("submit", onSubmit);
 
-// Search player
 document.getElementById("searchBtn").addEventListener("click", searchPlayer);
 
 function onSubmit(e) {
@@ -82,7 +81,6 @@ function appendPlayerToPage(player) {
     .addEventListener("click", () => editPlayer(player.id));
 }
 
-// Delete player
 function deletePlayer(id) {
   axios
     .delete(`http://localhost:3000/players/${id}`)
@@ -92,7 +90,6 @@ function deletePlayer(id) {
     .catch((err) => console.log(err));
 }
 
-// Edit player
 function editPlayer(id) {
   axios
     .get(`http://localhost:3000/players/${id}`)
@@ -116,7 +113,6 @@ function editPlayer(id) {
     .catch((err) => console.log(err));
 }
 
-// Search player
 function searchPlayer() {
   const searchValue = document
     .getElementById("searchInput")
@@ -135,7 +131,6 @@ function searchPlayer() {
     .catch((err) => console.log(err));
 }
 
-// Reset form
 function resetForm() {
   form.reset();
   document.getElementById("submitbtn").value = "Submit";
