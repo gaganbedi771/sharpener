@@ -32,7 +32,7 @@ app.use((req, res) => {
 
 (async () => {
   try {
-    await db.sync({ force: false  });
+    await db.sync({ alter: true  });
     app.listen(3000, () => {
       console.log("App listening on port 3000");
     });

@@ -1,6 +1,7 @@
-const { User } = require("../models/index");
+const { User,Expense } = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.signup = async (req, res) => {
   try {
@@ -44,8 +45,12 @@ exports.signin = async (req, res) => {
     if (!isMatch) {
       return sendErrorResponse(res, 401, "Wrong Password");
     }
-
-    return sendResponse(res, 200, "SignIn Successful");
+    const token = jwt.sign({ id: user.id, username: user.username }, "secret");
+    
+    return sendResponse(res, 200, {
+      token: token,
+      message: "SignIn Successful",
+    });
   } catch (error) {
     console.log(error);
     return sendErrorResponse(res, 500, error.message);

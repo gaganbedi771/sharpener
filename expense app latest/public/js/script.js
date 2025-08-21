@@ -1,15 +1,16 @@
 let form = document.getElementById("my-form");
 
 window.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
   axios
-    .get("http://localhost:3000/expense")
+    .get("http://localhost:3000/expense", { headers: { Authorization: token } })
     .then((allData) => {
       console.log(allData.data);
       if (allData.data.length) {
-
         allData.data.forEach((data) => {
           console.log(data);
           appendDataToPage(data);
+          updateTotalExpense();
         });
       }
     })
@@ -23,6 +24,7 @@ document.getElementById("expenseList").addEventListener("click", alterDetail);
 
 function onSubmit(e) {
   e.preventDefault();
+  const token = localStorage.getItem("token");
   if (document.getElementById("submitbtn").innerText == "Update") {
     const id = document.getElementById("userId").value;
 
@@ -30,12 +32,18 @@ function onSubmit(e) {
     const updatedAmount = document.getElementById("amount").value;
     const updatedCategory = document.getElementById("category").value;
 
+
+
     axios
-      .patch(`http://localhost:3000/expense/${id}`, {
-        description: updatedDescription,
-        amount: updatedAmount,
-        category: updatedCategory,
-      })
+      .patch(
+        `http://localhost:3000/expense/${id}`,
+        {
+          description: updatedDescription,
+          amount: updatedAmount,
+          category: updatedCategory,
+        },
+        { headers: { Authorization: token } }
+      )
       .then((result) => {
         console.log(result);
         document.getElementById(id).remove();
@@ -45,6 +53,7 @@ function onSubmit(e) {
           amount: updatedAmount,
           category: updatedCategory,
         });
+        updateTotalExpense();
 
         document.getElementById("description").value = "";
         document.getElementById("amount").value = "";
@@ -57,14 +66,19 @@ function onSubmit(e) {
   } else {
     console.log("here");
     axios
-      .post("http://localhost:3000/expense", {
-        description: document.getElementById("description").value,
-        amount: document.getElementById("amount").value,
-        category: document.getElementById("category").value,
-      })
+      .post(
+        "http://localhost:3000/expense",
+        {
+          description: document.getElementById("description").value,
+          amount: document.getElementById("amount").value,
+          category: document.getElementById("category").value,
+        },
+        { headers: { Authorization: token } }
+      )
       .then((result) => {
-        console.log(result,result.data);
+        console.log(result, result.data);
         appendDataToPage(result.data);
+        updateTotalExpense();
         document.getElementById("description").value = "";
         document.getElementById("amount").value = "";
         document.getElementById("category").value = "";
@@ -82,17 +96,17 @@ function appendDataToPage(data) {
   //make an li item
   let li = document.createElement("li");
   li.id = id;
+  li.setAttribute("data-amount", amount);
   li.appendChild(
     document.createTextNode(
       `${category}: Amount of RS ${amount} spent on ${description}, `
     )
   );
 
-  //append buttons
   let btnDel = document.createElement("button");
   let btnEdit = document.createElement("button");
-  btnDel.classDescription = "btn-delete";
-  btnEdit.classDescription = "btn-edit";
+  btnDel.className = "btn-delete";
+  btnEdit.className = "btn-edit";
   btnEdit.appendChild(document.createTextNode("Edit"));
   btnDel.appendChild(document.createTextNode("Delete"));
   li.append(btnEdit);
@@ -105,25 +119,27 @@ function appendDataToPage(data) {
 function alterDetail(e) {
   e.preventDefault();
   const id = e.target.parentNode.id;
+  const token = localStorage.getItem("token");
   console.log(id);
-  if (e.target.classDescription == "btn-delete") {
+  if (e.target.className == "btn-delete") {
     axios
-      .delete(`http://localhost:3000/expense/${id}`)
+      .delete(`http://localhost:3000/expense/${id}`, { headers: { Authorization: token } })
       .then((result) => {
         console.log(result);
         e.target.parentNode.remove();
+        updateTotalExpense();
       })
       .catch((err) => {
         console.log(err);
       });
-  } else if (e.target.classDescription == "btn-edit") {
+  } else if (e.target.className == "btn-edit") {
     console.log(id);
 
-    axios.get(`http://localhost:3000/expense/${id}`).then((user) => {
-      console.log(user.data.description);
-      document.getElementById("description").value = user.data.description;
-      document.getElementById("amount").value = user.data.amount;
-      document.getElementById("category").value = user.data.category;
+    axios.get(`http://localhost:3000/expense/${id}`, { headers: { Authorization: token } }).then((user) => {
+      console.log(user.data[0].description);
+      document.getElementById("description").value = user.data[0].description;
+      document.getElementById("amount").value = user.data[0].amount;
+      document.getElementById("category").value = user.data[0].category;
       document.getElementById("submitbtn").innerText = "Update";
       document.getElementById("userId").value = id;
     });
@@ -159,6 +175,7 @@ function signin(e) {
   axios
     .post("http://localhost:3000/user/signin", { email, password })
     .then((result) => {
+      localStorage.setItem("token", result.data.data.token);
       alert("SignIn Successful");
       window.location.href = "index.html";
     })
@@ -169,4 +186,14 @@ function signin(e) {
           (err.response?.data?.message || "Something went wrong")
       );
     });
+}
+
+function updateTotalExpense() {
+  const allExpenses = document.querySelectorAll("#expenseList li");
+  let total = 0;
+  allExpenses.forEach((li) => {
+    const amount = li.getAttribute("data-amount"); // get the amount
+    total += Number(amount);
+  });
+  document.getElementById("totalAmount").innerText = total;
 }
