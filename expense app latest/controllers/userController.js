@@ -1,5 +1,6 @@
 const { User } = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
+const bcrypt = require("bcrypt");
 
 exports.signup = async (req, res) => {
   try {
@@ -15,7 +16,14 @@ exports.signup = async (req, res) => {
         "Email already exists. Continue to signin page"
       );
     }
-    const user = await User.create({ username, email, password });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
     return sendResponse(res, 201, "user successfully created");
   } catch (error) {
     console.error(error.message);
@@ -32,7 +40,8 @@ exports.signin = async (req, res) => {
       return sendErrorResponse(res, 404, "User Not Found");
     }
 
-    if (user.password !== password) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return sendErrorResponse(res, 401, "Wrong Password");
     }
 
