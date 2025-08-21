@@ -1,77 +1,61 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* General page style */
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.6;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9f9f9;
+  color: #333;
 }
 
-ul {
-  list-style: none;
+/* Signup form container */
+.container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
 }
 
-ul li {
-  padding: 5px;
-  background: #f4f4f4;
-  margin: 5px 0;
-}
-
-header {
-  background: #f4f4f4;
-  padding: 1rem;
+/* Heading */
+h1 {
+  margin-bottom: 20px;
   text-align: center;
 }
 
-.container {
-  margin: auto;
-  width: 500px;
-  overflow: auto;
-  padding: 3rem 2rem;
-}
-
-#my-form {
-  padding: 2rem;
-  background: #f4f4f4;
-}
-
-#my-form label {
-  display: block;
-}
-
-#my-form input[type='text'] {
+/* Input fields & button */
+form input, form button {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
+  padding: 10px;
+  margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #ccc;
-}
-
-.btn {
   display: block;
-  width: 100%;
-  padding: 10px 15px;
-  border: 0;
-  background: #333;
-  color: #fff;
-  border-radius: 5px;
-  margin: 5px 0;
+  font-size: 14px;
 }
 
-.btn:hover {
-  background: #444;
+/* Submit button style */
+form button {
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+  border: none;
 }
 
-.bg-dark {
-  background: #333;
-  color: #fff;
+form button:hover {
+  background: #45a049;
 }
 
-.error {
-  background: orangered;
-  color: #fff;
-  padding: 5px;
-  margin: 5px;
+/* Small text under form */
+form p {
+  text-align: center;
+  font-size: 14px;
+}
+
+form p a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+form p a:hover {
+  text-decoration: underline;
 }
