@@ -119,7 +119,7 @@ function signup(e) {
   const password = document.getElementById("password").value;
 
   axios
-    .post("http://localhost:3000/signup", { username, email, password })
+    .post("http://localhost:3000/user/signup", { username, email, password })
     .then((result) => {
       console.log(result);
       alert("SignUp Successful");
@@ -127,6 +127,10 @@ function signup(e) {
     })
     .catch((err) => {
       console.error("Signup error:", err);
-      alert("Signup failed. Please try again.");
+
+      alert(
+        "Signup failed." +
+          (err.response?.data?.message || "Something went wrong")
+      );
     });
 }
