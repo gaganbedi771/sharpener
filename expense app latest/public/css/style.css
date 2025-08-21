@@ -66,7 +66,7 @@ form button:hover {
   color: black;
 }
 
-.expenses {
+.expenses-list {
   max-width: 600px;
   margin: 20px auto;
   background: white;
@@ -96,4 +96,23 @@ form button:hover {
 .pagination {
   text-align: center;
   margin-top: 15px;
+}
+
+form select {
+  width: 50%;
+  padding: 10px;
+  margin: 8px auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  display: block;
+}
+
+.total-expense {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+  text-align: center;
 }

@@ -2,40 +2,51 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>JS For Beginners</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-  <header>
-    <h1>Expense Tracker</h1>
+
+  <header class="header">
+    <h2>Expense Tracker</h2>
+    <div class="header-actions">
+      <button id="buyPremiumBtn">Buy Premium</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
   </header>
 
-  <section class="container">
-    <form id="my-form">
-      <h1 id="h1">Add Expense</h1>
-      <div class="msg"></div>
-      <div>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name">
-      </div>
-      <div>
-        <label for="expense">Amount:</label>
-        <input type="text" id="expense" name="expense">
-      </div>
-      <input type="hidden" id="userId" value="">
-      <input id='submitbtn' class="btn" type="submit" value="Submit">
+  <section class="expense-form">
+    <h2>Add Expense</h2>
+    <form id="expenseForm">
+      <input type="hidden" value="" id="userId" />
+      <input type="number" id="amount" placeholder="Amount" required>
+      <input type="text" id="description" placeholder="Description" required>
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option value="food">Food</option>
+        <option value="travel">Travel</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="other">Other</option>
+      </select>
+      <button type="submit" id="submitbtn" value="Submit">Add Expense</button>
     </form>
-
-    <ul id="users"></ul>
-
   </section>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
+
+  <section class="expenses-list">
+    <h2>All Expenses</h2>
+    <ul id="expenseList"></ul>
+    <div id="pagination"></div>
+  </section>
+
+  <section class="total-expense">
+    <h3>Total Expense: <span id="totalAmount">0</span></h3>
+  </section>
 
   <script src="js/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 </body>
 

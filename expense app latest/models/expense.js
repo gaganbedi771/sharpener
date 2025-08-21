@@ -8,7 +8,11 @@ const Expense = db.define("expense", {
     allowNull: false,
     primaryKey: true,
   },
-  name: {
+  description: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  category: {
     type: DataTypes.STRING,
     allowNull: false,
   },

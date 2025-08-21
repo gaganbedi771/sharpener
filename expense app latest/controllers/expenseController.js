@@ -1,4 +1,4 @@
-const {Expense} = require("../models/index");
+const { Expense } = require("../models/index");
 
 exports.getAllExpenses = async (req, res) => {
   try {
@@ -24,9 +24,9 @@ exports.getExpenseById = async (req, res) => {
 
 exports.addExpense = async (req, res) => {
   try {
-    const { name, amount } = req.body;
+    const { description, amount, category } = req.body;
 
-    const expense = await Expense.create({ name, amount });
+    const expense = await Expense.create({ description, amount, category });
     res.json(expense);
   } catch (error) {
     console.log(error);
@@ -36,10 +36,11 @@ exports.addExpense = async (req, res) => {
 exports.editExpenseById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, amount } = req.body;
+    const { description, amount, category } = req.body;
     const expense = await Expense.findByPk(id);
-    expense.name = name ? name : expense.name;
+    expense.description = description ? description : expense.description;
     expense.amount = amount ? amount : expense.amount;
+    expense.category = category ? category : expense.category;
     await expense.save();
     res.json(expense);
   } catch (error) {
