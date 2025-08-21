@@ -16,9 +16,18 @@ app.get("/", (req, res) => {
 app.use("/expense", expenseRoute);
 app.use("/user", userRoute);
 
+app.use((req, res) => {
+  const filePath = path.join(__dirname, "views", req.url);
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.status(404).send("File not found");
+    }
+  });
+});
+
 (async () => {
   try {
-    await db.sync({ force: true });
+    await db.sync({ force: false });
     app.listen(3000, () => {
       console.log("App listening on port 3000");
     });
