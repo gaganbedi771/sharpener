@@ -121,15 +121,33 @@ function signup(e) {
   axios
     .post("http://localhost:3000/user/signup", { username, email, password })
     .then((result) => {
-      console.log(result);
       alert("SignUp Successful");
       window.location.href = "signin.html";
     })
     .catch((err) => {
-      console.error("Signup error:", err);
-
+      console.error("Signin error:", err);
       alert(
-        "Signup failed." +
+        "Signup failed: " +
+          (err.response?.data?.message || "Something went wrong")
+      );
+    });
+}
+
+function signin(e) {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  axios
+    .post("http://localhost:3000/user/signin", { email, password })
+    .then((result) => {
+      alert("SignIn Successful");
+      window.location.href = "index.html";
+    })
+    .catch((err) => {
+      console.error("Signin error:", err);
+      alert(
+        "SignIn failed: " +
           (err.response?.data?.message || "Something went wrong")
       );
     });
