@@ -9,10 +9,10 @@ const app = express();
 app.use(express.static("public"));
 app.use(express.json());
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
   console.log(req.url);
   next();
-})
+});
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "signup.html"));
@@ -32,7 +32,7 @@ app.use((req, res) => {
 
 (async () => {
   try {
-    await db.sync({ alter: true  });
+    await db.sync({ force: false });
     app.listen(3000, () => {
       console.log("App listening on port 3000");
     });

@@ -1,5 +1,11 @@
-const { User,Expense } = require("../models/index");
+const { User, Expense, Payment } = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
+const { Cashfree, CFEnvironment } = require("cashfree-pg");
+const cashfree = new Cashfree(
+  CFEnvironment.SANDBOX,
+  "TEST10769299a9d89d4f0c744d5bf66999296701",
+  "cfsk_ma_test_14cde4b8b95bf10556548aeea97c8072_119d75aa"
+);
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -46,11 +52,74 @@ exports.signin = async (req, res) => {
       return sendErrorResponse(res, 401, "Wrong Password");
     }
     const token = jwt.sign({ id: user.id, username: user.username }, "secret");
-    
+
     return sendResponse(res, 200, {
       token: token,
       message: "SignIn Successful",
     });
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+};
+
+exports.buyPremium = async (req, res) => {
+  try {
+    const userId = String(req.user.id);
+    const payment = await req.user.createPayment({ status: "Pending" });
+    const orderId = String(payment.id);
+    var request = {
+      order_amount: 999,
+      order_currency: "INR",
+      order_id: orderId,
+      customer_details: {
+        customer_id: userId,
+        customer_phone: "9999999999",
+      },
+      order_meta: {
+        return_url:
+          "http://localhost:3000/user/updatePremium?order_id={order_id}",
+      },
+    };
+
+    const response = await cashfree.PGCreateOrder(request);
+
+    console.log("Order created successfully:", response.data);
+    return sendResponse(res, 201, response.data);
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+};
+
+exports.updatePremium = async (req, res) => {
+  try {
+    const id = req.query.order_id;
+
+    console.log("langed in update");
+    const response = await cashfree.PGOrderFetchPayments(id);
+
+    console.log("Order fetched successfully:", response.data.payment_status);
+    const payment = await Payment.findByPk(id);
+    payment.status = response.data.payment_status;
+    await payment.save();
+    console.log(payment);
+    return res.redirect(303, "/index.html");
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+};
+
+exports.isPremium = async (req, res) => {
+  try {
+    const isPremium = await req.user.getPayments({
+      where: { status: "Success" },
+    });
+    if (isPremium) {
+      return sendResponse(res, 200, { isPremium: true });
+    }
+    return sendResponse(res, 200, { isPremium: false });
   } catch (error) {
     console.log(error);
     return sendErrorResponse(res, 500, error.message);

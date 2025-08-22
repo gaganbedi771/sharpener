@@ -1,22 +1,30 @@
 let form = document.getElementById("my-form");
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
-  axios
-    .get("http://localhost:3000/expense", { headers: { Authorization: token } })
-    .then((allData) => {
-      console.log(allData.data);
-      if (allData.data.length) {
-        allData.data.forEach((data) => {
-          console.log(data);
-          appendDataToPage(data);
-          updateTotalExpense();
-        });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  const config = { headers: { Authorization: token } };
+
+  try {
+    const [expensesRes, premiumRes] = await Promise.all([
+      axios.get("http://localhost:3000/expense", config),
+      axios.get("http://localhost:3000/user/isPremium", config),
+    ]);
+
+    // Handle Premium status
+    if (premiumRes.data.success && premiumRes.data.data.isPremium) {
+      console.log("User is premium");
+      const btn = document.getElementById("buyPremiumBtn").remove();
+    }
+
+    if (Array.isArray(expensesRes.data) && expensesRes.data.length) {
+      expensesRes.data.forEach((entry) => {
+        appendDataToPage(entry);
+        updateTotalExpense();
+      });
+    }
+  } catch (err) {
+    console.error("Error fetching data:", err);
+  }
 });
 
 document.getElementById("expenseForm").addEventListener("submit", onSubmit);
@@ -31,8 +39,6 @@ function onSubmit(e) {
     const updatedDescription = document.getElementById("description").value;
     const updatedAmount = document.getElementById("amount").value;
     const updatedCategory = document.getElementById("category").value;
-
-
 
     axios
       .patch(
@@ -123,7 +129,9 @@ function alterDetail(e) {
   console.log(id);
   if (e.target.className == "btn-delete") {
     axios
-      .delete(`http://localhost:3000/expense/${id}`, { headers: { Authorization: token } })
+      .delete(`http://localhost:3000/expense/${id}`, {
+        headers: { Authorization: token },
+      })
       .then((result) => {
         console.log(result);
         e.target.parentNode.remove();
@@ -135,14 +143,18 @@ function alterDetail(e) {
   } else if (e.target.className == "btn-edit") {
     console.log(id);
 
-    axios.get(`http://localhost:3000/expense/${id}`, { headers: { Authorization: token } }).then((user) => {
-      console.log(user.data[0].description);
-      document.getElementById("description").value = user.data[0].description;
-      document.getElementById("amount").value = user.data[0].amount;
-      document.getElementById("category").value = user.data[0].category;
-      document.getElementById("submitbtn").innerText = "Update";
-      document.getElementById("userId").value = id;
-    });
+    axios
+      .get(`http://localhost:3000/expense/${id}`, {
+        headers: { Authorization: token },
+      })
+      .then((user) => {
+        console.log(user.data[0].description);
+        document.getElementById("description").value = user.data[0].description;
+        document.getElementById("amount").value = user.data[0].amount;
+        document.getElementById("category").value = user.data[0].category;
+        document.getElementById("submitbtn").innerText = "Update";
+        document.getElementById("userId").value = id;
+      });
   }
 }
 
@@ -197,3 +209,31 @@ function updateTotalExpense() {
   });
   document.getElementById("totalAmount").innerText = total;
 }
+
+document.getElementById("buyPremiumBtn").addEventListener("click", () => {
+  const token = localStorage.getItem("token");
+
+  axios
+    .get("http://localhost:3000/user/buyPremium", {
+      headers: { Authorization: token },
+    })
+    .then((result) => {
+      // console.log(result.data.data.payment_session_id);
+      const payment_session_id = result.data.data.payment_session_id;
+      let checkoutOptions = {
+        paymentSessionId: payment_session_id,
+        redirectTarget: "_self",
+      };
+
+      cashfree.checkout(checkoutOptions).then((result) => {
+        if (result.error) {
+          console.error("Checkout error:", result.error.message);
+        } else if (result.redirect) {
+          console.log("Redirecting to checkout...");
+        }
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
