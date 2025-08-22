@@ -1,6 +1,7 @@
 const { User, Expense, Payment } = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
 const { Cashfree, CFEnvironment } = require("cashfree-pg");
+const {Sequelize}=require("sequelize");
 const cashfree = new Cashfree(
   CFEnvironment.SANDBOX,
   process.env.TEST_ID,
@@ -96,14 +97,14 @@ exports.updatePremium = async (req, res) => {
   try {
     const id = req.query.order_id;
 
-    console.log("langed in update",id);
+    console.log("langed in update", id);
     const response = await cashfree.PGOrderFetchPayments(id);
     console.log("Order fetched successfully:", response.data[0].payment_status);
     const payment = await Payment.findByPk(id);
-    console.log(payment,"before update");
+    console.log(payment, "before update");
     payment.status = response.data[0].payment_status;
     await payment.save();
-    console.log(payment,"after update");
+    console.log(payment, "after update");
     return res.redirect(303, "/index.html");
   } catch (error) {
     console.log(error);
@@ -113,14 +114,13 @@ exports.updatePremium = async (req, res) => {
 
 exports.isPremium = async (req, res) => {
   try {
-    
     const isPremium = await req.user.getPayments({
       where: { status: "Success" },
     });
     // console.log(req.user.id,"here is user id");
-  
+
     // console.log(isPremium,"aray");
-    if (isPremium.length>0) {
+    if (isPremium.length > 0) {
       return sendResponse(res, 200, { isPremium: true });
     }
     return sendResponse(res, 200, { isPremium: false });
@@ -129,3 +129,29 @@ exports.isPremium = async (req, res) => {
     return sendErrorResponse(res, 500, error.message);
   }
 };
+
+exports.leaderboard=async(req,res)=>{
+  try {
+    const allExpense=await Expense.findAll({
+      attributes:[
+        "userId",
+        [Sequelize.fn("SUM",Sequelize.col("amount")),"totalExpense"]
+      ],
+      include:[
+        {
+          model:User,
+          attributes:["username"]
+        }
+      ],
+      group:["userId"],
+      order:[[Sequelize.fn("SUM",Sequelize.col("amount")),"DESC"]]
+
+      
+    });
+
+    return sendResponse(res,201,allExpense);
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+}

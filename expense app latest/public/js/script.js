@@ -12,8 +12,42 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     // Handle Premium status
     if (premiumRes.data.success && premiumRes.data.data.isPremium) {
-      console.log(premiumRes.data.data.isPremium,premiumRes);
-      const btn = document.getElementById("buyPremiumBtn").remove();
+      console.log(premiumRes.data.data.isPremium, premiumRes);
+      const btnPremium = document.getElementById("buyPremiumBtn");
+      const btnLeaderboard = document.getElementById("leaderBoardBtn");
+      btnPremium.innerText = "Premium User";
+      btnPremium.disabled = true;
+      btnPremium.style.cursor = "not-allowed";
+
+      btnLeaderboard.style.display = "inline-block";
+
+      const popup = document.getElementById("leaderBoardPopup");
+      const list = document.getElementById("leaderBoardList");
+
+      btnLeaderboard.addEventListener("click", async () => {
+        try {
+          popup.style.display = "block";
+
+          const token = localStorage.getItem("token"); 
+          const res = await axios.get(
+            "http://localhost:3000/user/leaderboard",
+            {
+              headers: { Authorization: token },
+            }
+          );
+
+          list.innerHTML = "";
+          console.log(res.data.data);
+          // Assuming API returns: [{ username: "user1", totalExpense: 500 }, ...]
+          res.data.data.forEach((entry) => {
+            const li = document.createElement("li");
+            li.textContent = `${entry.user.username} - ₹${entry.totalExpense}`;
+            list.appendChild(li);
+          });
+        } catch (err) {
+          console.error("Error fetching leaderboard:", err);
+        }
+      });
     }
 
     if (Array.isArray(expensesRes.data) && expensesRes.data.length) {

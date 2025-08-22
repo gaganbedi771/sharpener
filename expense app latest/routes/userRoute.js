@@ -8,5 +8,6 @@ router.post("/signin", userController.signin);
 router.get("/buyPremium", authorization.auth, userController.buyPremium);
 router.get("/updatePremium", userController.updatePremium);
 router.get("/isPremium",authorization.auth, userController.isPremium);
+router.get("/leaderboard",authorization.auth, userController.leaderboard);
 
 module.exports = router;
