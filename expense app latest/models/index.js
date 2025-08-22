@@ -11,5 +11,5 @@ Payment.belongsTo(User);
 module.exports = {
   User,
   Expense,
-  Payment,
+  Payment
 };

@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     // Handle Premium status
     if (premiumRes.data.success && premiumRes.data.data.isPremium) {
-      console.log("User is premium");
+      console.log(premiumRes.data.data.isPremium,premiumRes);
       const btn = document.getElementById("buyPremiumBtn").remove();
     }
 

@@ -3,8 +3,8 @@ const { sendResponse, sendErrorResponse } = require("../utils/response");
 const { Cashfree, CFEnvironment } = require("cashfree-pg");
 const cashfree = new Cashfree(
   CFEnvironment.SANDBOX,
-  "TEST10769299a9d89d4f0c744d5bf66999296701",
-  "cfsk_ma_test_14cde4b8b95bf10556548aeea97c8072_119d75aa"
+  process.env.TEST_ID,
+  process.env.TEST_KEY
 );
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -96,14 +96,14 @@ exports.updatePremium = async (req, res) => {
   try {
     const id = req.query.order_id;
 
-    console.log("langed in update");
+    console.log("langed in update",id);
     const response = await cashfree.PGOrderFetchPayments(id);
-
-    console.log("Order fetched successfully:", response.data.payment_status);
+    console.log("Order fetched successfully:", response.data[0].payment_status);
     const payment = await Payment.findByPk(id);
-    payment.status = response.data.payment_status;
+    console.log(payment,"before update");
+    payment.status = response.data[0].payment_status;
     await payment.save();
-    console.log(payment);
+    console.log(payment,"after update");
     return res.redirect(303, "/index.html");
   } catch (error) {
     console.log(error);
@@ -113,10 +113,14 @@ exports.updatePremium = async (req, res) => {
 
 exports.isPremium = async (req, res) => {
   try {
+    
     const isPremium = await req.user.getPayments({
       where: { status: "Success" },
     });
-    if (isPremium) {
+    // console.log(req.user.id,"here is user id");
+  
+    // console.log(isPremium,"aray");
+    if (isPremium.length>0) {
       return sendResponse(res, 200, { isPremium: true });
     }
     return sendResponse(res, 200, { isPremium: false });

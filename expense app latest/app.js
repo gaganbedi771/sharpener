@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const db = require("./utils/db_connection");
 require("./models/index");
+require("dotenv").config();
 const expenseRoute = require("./routes/expenseRoute");
 const userRoute = require("./routes/userRoute");
 const app = express();
@@ -32,7 +33,7 @@ app.use((req, res) => {
 
 (async () => {
   try {
-    await db.sync({ force: false });
+    await db.sync({ alter: true });
     app.listen(3000, () => {
       console.log("App listening on port 3000");
     });
