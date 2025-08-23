@@ -28,7 +28,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         try {
           popup.style.display = "block";
 
-          const token = localStorage.getItem("token"); 
+          const token = localStorage.getItem("token");
           const res = await axios.get(
             "http://localhost:3000/user/leaderboard",
             {
@@ -64,6 +64,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 document.getElementById("expenseForm").addEventListener("submit", onSubmit);
 document.getElementById("expenseList").addEventListener("click", alterDetail);
+document.getElementById("logoutBtn").addEventListener("click",logout);
 
 function onSubmit(e) {
   e.preventDefault();
@@ -272,3 +273,25 @@ document.getElementById("buyPremiumBtn").addEventListener("click", () => {
       console.log(err);
     });
 });
+
+async function sendPasswordResetLink(e) {
+  try {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const response = await axios.get(
+      `http://localhost:3000/user/forgotPassword/${email}`
+    );
+    email.value = "";
+
+    alert(response.data.data.message);
+  } catch (error) {
+    console.log(error);
+    email.value = "";
+    alert(error.response.data.message);
+  }
+}
+
+function logout(){
+  localStorage.removeItem("token");
+  window.location.href="signin.html";
+}

@@ -1,9 +1,10 @@
 const { User, Expense, Payment } = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
 const { Cashfree, CFEnvironment } = require("cashfree-pg");
-const {Sequelize}=require("sequelize");
-const db=require("../utils/db_connection");
-const transaction=db.transaction();
+const { Sequelize } = require("sequelize");
+const db = require("../utils/db_connection");
+const transaction = db.transaction();
+const sendPasswordResetEmail=require("../utils/sendEmail");
 const cashfree = new Cashfree(
   CFEnvironment.SANDBOX,
   process.env.TEST_ID,
@@ -132,7 +133,7 @@ exports.isPremium = async (req, res) => {
   }
 };
 
-exports.leaderboard=async(req,res)=>{
+exports.leaderboard = async (req, res) => {
   try {
     // const allExpense=await Expense.findAll({
     //   attributes:[
@@ -148,17 +149,32 @@ exports.leaderboard=async(req,res)=>{
     //   group:["userId"],
     //   order:[[Sequelize.fn("SUM",Sequelize.col("amount")),"DESC"]]
 
-      
     // });
-    const allExpense=await User.findAll(
-      {attributes:["username","totalExpense"],
-        order:[["totalExpense","DESC"]]
-      }
-    )
+    const allExpense = await User.findAll({
+      attributes: ["username", "totalExpense"],
+      order: [["totalExpense", "DESC"]],
+    });
 
-    return sendResponse(res,201,allExpense);
+    return sendResponse(res, 201, allExpense);
   } catch (error) {
     console.log(error);
     return sendErrorResponse(res, 500, error.message);
   }
-}
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return sendErrorResponse(res, 404, "User Not Found");
+    }
+   const response= await sendPasswordResetEmail(user.email,"http://localhost:3000/user/reset");
+   console.log(response,"heeree");
+    return sendResponse(res,200,{ message: "Kindly check email. Passowrd reset link sent." });
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+};
