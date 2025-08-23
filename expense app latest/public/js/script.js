@@ -40,8 +40,9 @@ window.addEventListener("DOMContentLoaded", async () => {
           console.log(res.data.data);
           // Assuming API returns: [{ username: "user1", totalExpense: 500 }, ...]
           res.data.data.forEach((entry) => {
+            console.log(entry);
             const li = document.createElement("li");
-            li.textContent = `${entry.user.username} - ₹${entry.totalExpense}`;
+            li.textContent = `${entry.username} - ₹${entry.totalExpense}`;
             list.appendChild(li);
           });
         } catch (err) {

@@ -132,22 +132,27 @@ exports.isPremium = async (req, res) => {
 
 exports.leaderboard=async(req,res)=>{
   try {
-    const allExpense=await Expense.findAll({
-      attributes:[
-        "userId",
-        [Sequelize.fn("SUM",Sequelize.col("amount")),"totalExpense"]
-      ],
-      include:[
-        {
-          model:User,
-          attributes:["username"]
-        }
-      ],
-      group:["userId"],
-      order:[[Sequelize.fn("SUM",Sequelize.col("amount")),"DESC"]]
+    // const allExpense=await Expense.findAll({
+    //   attributes:[
+    //     "userId",
+    //     [Sequelize.fn("SUM",Sequelize.col("amount")),"totalExpense"]
+    //   ],
+    //   include:[
+    //     {
+    //       model:User,
+    //       attributes:["username"]
+    //     }
+    //   ],
+    //   group:["userId"],
+    //   order:[[Sequelize.fn("SUM",Sequelize.col("amount")),"DESC"]]
 
       
-    });
+    // });
+    const allExpense=await User.findAll(
+      {attributes:["username","totalExpense"],
+        order:[["totalExpense","DESC"]]
+      }
+    )
 
     return sendResponse(res,201,allExpense);
   } catch (error) {
