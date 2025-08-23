@@ -2,6 +2,8 @@ const { User, Expense, Payment } = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
 const { Cashfree, CFEnvironment } = require("cashfree-pg");
 const {Sequelize}=require("sequelize");
+const db=require("../utils/db_connection");
+const transaction=db.transaction();
 const cashfree = new Cashfree(
   CFEnvironment.SANDBOX,
   process.env.TEST_ID,
