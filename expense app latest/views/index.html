@@ -47,7 +47,18 @@
   <section class="expenses-list">
     <h2>All Expenses</h2>
     <ul id="expenseList"></ul>
-    <div id="pagination"></div>
+    <!-- <div id="pagination"></div> -->
+    <div id="paginationControls">
+      <label for="limitSelect">Items per page: </label>
+      <select id="limitSelect">
+        <option value="2" selected>2</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+      </select>
+      <div id="pagination"></div>
+    </div>
+
   </section>
 
   <section class="total-expense">

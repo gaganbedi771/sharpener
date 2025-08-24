@@ -1,11 +1,51 @@
 let form = document.getElementById("my-form");
 
-
 window.addEventListener("DOMContentLoaded", async () => {
   let currentPage = 1;
-const limit = 2;
+  let limit = localStorage.getItem("limit")
+    ? parseInt(localStorage.getItem("limit"))
+    : 2;
   const token = localStorage.getItem("token");
   const config = { headers: { Authorization: token } };
+
+  const limitSelect = document.getElementById("limitSelect");
+  limitSelect.value = limit;
+
+  limitSelect.addEventListener("change", () => {
+    limit = parseInt(limitSelect.value);
+    localStorage.setItem("limit", limit);
+    loadPage(1); // reload expenses with new limit, start from page 1
+  });
+
+  
+    function renderPagination(currentPage, lastPage) {
+      const paginationDiv = document.getElementById("pagination");
+      paginationDiv.innerHTML = "";
+
+      for (let i = 1; i <= lastPage; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.disabled = true; // highlight current
+        btn.onclick = () => loadPage(i);
+        paginationDiv.appendChild(btn);
+      }
+    }
+
+    async function loadPage(page) {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: token } };
+
+      const res = await axios.get(
+        `http://localhost:3000/expense?page=${page}&limit=${limit}`,
+        config
+      );
+
+      document.getElementById("expenseList").innerHTML = "";
+      res.data.expenses.forEach((exp) => appendDataToPage(exp));
+
+      renderPagination(page, res.data.lastPage);
+    }
+
 
   try {
     const [expensesRes, premiumRes] = await Promise.all([
@@ -78,34 +118,6 @@ const limit = 2;
     }
 
     renderPagination(currentPage, expensesRes.data.lastPage);
-
-    function renderPagination(currentPage, lastPage) {
-      const paginationDiv = document.getElementById("pagination");
-      paginationDiv.innerHTML = "";
-
-      for (let i = 1; i <= lastPage; i++) {
-        const btn = document.createElement("button");
-        btn.textContent = i;
-        if (i === currentPage) btn.disabled = true; // highlight current
-        btn.onclick = () => loadPage(i);
-        paginationDiv.appendChild(btn);
-      }
-    }
-
-    async function loadPage(page) {
-      const token = localStorage.getItem("token");
-      const config = { headers: { Authorization: token } };
-
-      const res = await axios.get(
-        `http://localhost:3000/expense?page=${page}&limit=${limit}`,
-        config
-      );
-
-      document.getElementById("expenseList").innerHTML = "";
-      res.data.expenses.forEach((exp) => appendDataToPage(exp));
-
-      renderPagination(res.data.currentPage, res.data.lastPage);
-    }
   } catch (err) {
     console.error("Error fetching data:", err);
   }
