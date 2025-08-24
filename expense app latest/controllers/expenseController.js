@@ -80,7 +80,6 @@ exports.deleteExpenseById = async (req, res) => {
     expense = expense[0];
     const expenseAmountToDelete = expense.amount;
 
-    await req.user.removeExpense(expense, { transaction: t });
     await expense.destroy({ transaction: t });
 
     const user = await User.findByPk(req.user.id, { transaction: t });

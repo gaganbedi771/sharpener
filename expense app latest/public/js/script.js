@@ -64,7 +64,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 document.getElementById("expenseForm").addEventListener("submit", onSubmit);
 document.getElementById("expenseList").addEventListener("click", alterDetail);
-document.getElementById("logoutBtn").addEventListener("click",logout);
+document.getElementById("logoutBtn").addEventListener("click", logout);
 
 function onSubmit(e) {
   e.preventDefault();
@@ -277,11 +277,11 @@ document.getElementById("buyPremiumBtn").addEventListener("click", () => {
 async function sendPasswordResetLink(e) {
   try {
     e.preventDefault();
-    const email = document.getElementById("email").value;
+    let email = document.getElementById("email").value;
     const response = await axios.get(
       `http://localhost:3000/user/forgotPassword/${email}`
     );
-    email.value = "";
+    email = "";
 
     alert(response.data.data.message);
   } catch (error) {
@@ -291,7 +291,24 @@ async function sendPasswordResetLink(e) {
   }
 }
 
-function logout(){
+function logout() {
   localStorage.removeItem("token");
-  window.location.href="signin.html";
+  window.location.href = "signin.html";
+}
+
+async function setPassword(e) {
+  try {
+    e.preventDefault();
+    const urlArray = window.location.pathname.split("/");
+    const uuid = urlArray.pop();
+    const password = document.getElementById("newPassword").value;
+    const response = await axios.post(
+      `http://localhost:3000/user/resetPassword/${uuid}`,
+      { password }
+    );
+    alert(response.data.data.message);
+    window.location.href = response.data.data.redirectTo;
+  } catch (error) {
+    alert(error.response.data.message);
+  }
 }

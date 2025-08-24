@@ -1,10 +1,16 @@
-const { User, Expense, Payment } = require("../models/index");
+const {
+  User,
+  Expense,
+  Payment,
+  ForgotPasswordRequest,
+} = require("../models/index");
 const { sendResponse, sendErrorResponse } = require("../utils/response");
 const { Cashfree, CFEnvironment } = require("cashfree-pg");
 const { Sequelize } = require("sequelize");
 const db = require("../utils/db_connection");
+const path = require("path");
 const transaction = db.transaction();
-const sendPasswordResetEmail=require("../utils/sendEmail");
+const sendPasswordResetEmail = require("../utils/sendEmail");
 const cashfree = new Cashfree(
   CFEnvironment.SANDBOX,
   process.env.TEST_ID,
@@ -170,11 +176,68 @@ exports.forgotPassword = async (req, res) => {
     if (!user) {
       return sendErrorResponse(res, 404, "User Not Found");
     }
-   const response= await sendPasswordResetEmail(user.email,"http://localhost:3000/user/reset");
-   console.log(response,"heeree");
-    return sendResponse(res,200,{ message: "Kindly check email. Passowrd reset link sent." });
+    const passwordRequest = await ForgotPasswordRequest.create({
+      userId: user.id,
+    });
+    // console.log(passwordRequest.id);
+    const response = await sendPasswordResetEmail(
+      user.email,
+      `http://localhost:3000/user/resetPasswordPage/${passwordRequest.id}`
+    );
+    // console.log(response, "heeree");
+    return sendResponse(res, 200, {
+      message: "Kindly check email. Passowrd reset link sent.",
+    });
   } catch (error) {
     console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+};
+
+exports.resetPasswordPage = async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    res.sendFile(path.join(__dirname, "..", "views", "reset.html"));
+  } catch (error) {
+    console.log(error);
+    return sendErrorResponse(res, 500, error.message);
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const t = await db.transaction();
+
+  try {
+    const { uuid } = req.params;
+    const { password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const passwordRequest = await ForgotPasswordRequest.findByPk(uuid, {
+      transaction: t,
+    });
+    if (!passwordRequest.isActive) {
+      throw new Error("Password Request Expired");
+    }
+
+    const user = await User.findByPk(passwordRequest.userId, {
+      transaction: t,
+    });
+    console.log(user, passwordRequest);
+    user.password = hashedPassword;
+
+    passwordRequest.isActive = false;
+
+    await user.save({ transaction: t });
+    await passwordRequest.save({ transaction: t });
+
+    await t.commit();
+    sendResponse(res, 200, {
+      message: "Password reset successful. Redirecting to SignIn Page",
+      redirectTo: "http://localhost:3000/signin.html",
+    });
+  } catch (error) {
+    console.log(error);
+    await t.rollback();
     return sendErrorResponse(res, 500, error.message);
   }
 };
