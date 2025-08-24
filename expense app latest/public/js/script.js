@@ -1,35 +1,40 @@
 let form = document.getElementById("my-form");
 
+
 window.addEventListener("DOMContentLoaded", async () => {
+  let currentPage = 1;
+const limit = 2;
   const token = localStorage.getItem("token");
   const config = { headers: { Authorization: token } };
 
   try {
     const [expensesRes, premiumRes] = await Promise.all([
-      axios.get("http://localhost:3000/expense", config),
+      axios.get(
+        `http://localhost:3000/expense?page=${currentPage}&limit=${limit}`,
+        config
+      ),
       axios.get("http://localhost:3000/user/isPremium", config),
     ]);
 
-    // Handle Premium status
     if (premiumRes.data.success && premiumRes.data.data.isPremium) {
       console.log(premiumRes.data.data.isPremium, premiumRes);
       const btnPremium = document.getElementById("buyPremiumBtn");
       const btnLeaderboard = document.getElementById("leaderBoardBtn");
-      const btnReportDownload = document.getElementById("leaderBoardBtn");
+      const btnReportDownload = document.getElementById("reportDownloadBtn");
       btnPremium.innerText = "Premium User";
       btnPremium.disabled = true;
       btnPremium.style.cursor = "not-allowed";
 
-      btnReportDownload.disabled=false;
+      btnReportDownload.disabled = false;
 
       btnLeaderboard.style.display = "inline-block";
 
       const popup = document.getElementById("leaderBoardPopup");
       const list = document.getElementById("leaderBoardList");
 
-      btnReportDownload.addEventListener("click",async=>{
-        window.location.href="report.html"
-      })
+      btnReportDownload.addEventListener("click", (async) => {
+        window.location.href = "report.html";
+      });
 
       btnLeaderboard.addEventListener("click", async () => {
         try {
@@ -45,7 +50,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
           list.innerHTML = "";
           console.log(res.data.data);
-          // Assuming API returns: [{ username: "user1", totalExpense: 500 }, ...]
+
           res.data.data.forEach((entry) => {
             console.log(entry);
             const li = document.createElement("li");
@@ -58,11 +63,48 @@ window.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    if (Array.isArray(expensesRes.data) && expensesRes.data.length) {
-      expensesRes.data.forEach((entry) => {
+    console.log(expensesRes);
+
+    document.getElementById("expenseList").innerHTML = "";
+
+    if (
+      Array.isArray(expensesRes.data.expenses) &&
+      expensesRes.data.expenses.length
+    ) {
+      expensesRes.data.expenses.forEach((entry) => {
         appendDataToPage(entry);
         updateTotalExpense();
       });
+    }
+
+    renderPagination(currentPage, expensesRes.data.lastPage);
+
+    function renderPagination(currentPage, lastPage) {
+      const paginationDiv = document.getElementById("pagination");
+      paginationDiv.innerHTML = "";
+
+      for (let i = 1; i <= lastPage; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.disabled = true; // highlight current
+        btn.onclick = () => loadPage(i);
+        paginationDiv.appendChild(btn);
+      }
+    }
+
+    async function loadPage(page) {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: token } };
+
+      const res = await axios.get(
+        `http://localhost:3000/expense?page=${page}&limit=${limit}`,
+        config
+      );
+
+      document.getElementById("expenseList").innerHTML = "";
+      res.data.expenses.forEach((exp) => appendDataToPage(exp));
+
+      renderPagination(res.data.currentPage, res.data.lastPage);
     }
   } catch (err) {
     console.error("Error fetching data:", err);
@@ -161,7 +203,6 @@ function appendDataToPage(data) {
   li.append(btnEdit);
   li.append(btnDel);
 
-  //append in dom
   document.getElementById("expenseList").appendChild(li);
 }
 

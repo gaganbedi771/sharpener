@@ -3,8 +3,22 @@ const db = require("../utils/db_connection");
 
 exports.getAllExpenses = async (req, res) => {
   try {
-    const expenses = await req.user.getExpenses();
-    res.json(expenses);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Expense.findAndCountAll({
+      where:{userId:req.user.id},
+      limit: limit,
+      offset: offset,
+      order: [["createdAt", "DESC"]],
+    });
+    console.log(count,rows);
+    res.json({
+      expenses:rows,
+      totalEntries:count,
+      lastPage:Math.ceil(count/limit)
+    });
   } catch (error) {
     console.log(error);
   }
