@@ -15,14 +15,21 @@ window.addEventListener("DOMContentLoaded", async () => {
       console.log(premiumRes.data.data.isPremium, premiumRes);
       const btnPremium = document.getElementById("buyPremiumBtn");
       const btnLeaderboard = document.getElementById("leaderBoardBtn");
+      const btnReportDownload = document.getElementById("leaderBoardBtn");
       btnPremium.innerText = "Premium User";
       btnPremium.disabled = true;
       btnPremium.style.cursor = "not-allowed";
+
+      btnReportDownload.disabled=false;
 
       btnLeaderboard.style.display = "inline-block";
 
       const popup = document.getElementById("leaderBoardPopup");
       const list = document.getElementById("leaderBoardList");
+
+      btnReportDownload.addEventListener("click",async=>{
+        window.location.href="report.html"
+      })
 
       btnLeaderboard.addEventListener("click", async () => {
         try {
