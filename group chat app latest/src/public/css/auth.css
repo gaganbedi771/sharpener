@@ -33,7 +33,7 @@ form input {
 button {
   width: 100%;
   padding: 10px;
-  background: #4CAF50;
+  background: #4CAF50; /* default green */
   color: white;
   border: none;
   border-radius: 5px;

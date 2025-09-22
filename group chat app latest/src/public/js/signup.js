@@ -12,7 +12,7 @@ form.addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await axios.post("/api/auth/signup", userData);
+    const res = await axios.post("http://localhost:3000/user/signup", userData);
     message.style.color = "green";
     message.textContent = res.data.message || "Signup successful!";
     form.reset();
