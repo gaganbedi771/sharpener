@@ -14,8 +14,9 @@ form.addEventListener("submit", async (e) => {
     message.style.color = "green";
     message.textContent = res.data.message || "Sign in successful!";
     form.reset();
-    // redirect if needed
-    // window.location.href = "/chat.html";
+    const token= res.data.data.authorization;
+    localStorage.setItem("authorization",token);
+    window.location.href = "/chat.html";
   } catch (err) {
     message.style.color = "red";
     message.textContent = err.response?.data?.message || "Sign in failed!";

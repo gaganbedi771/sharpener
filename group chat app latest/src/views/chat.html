@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Chat</title>
+  <link rel="stylesheet" href="/css/chat.css">
+</head>
+<body>
+  <header>
+    <h2>Group Chat</h2>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <main>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h3>Rooms</h3>
+      <div class="room-actions">
+        <input type="text" id="roomName" placeholder="Enter room name">
+        <button id="createRoomBtn">Create Room</button>
+        <button id="joinRoomBtn">Join Room</button>
+      </div>
+      <ul id="roomList"></ul>
+    </aside>
+
+    <!-- Chat Section -->
+    <section class="chat-section">
+      <div id="chatWindow" class="chat-window"></div>
+      <form id="chatForm">
+        <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+        <input type="file" id="fileInput" accept="image/*,video/*,audio/*">
+        <button type="submit">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>
