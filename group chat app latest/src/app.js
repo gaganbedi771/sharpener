@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 
-const { userRoutes } = require("./routes/index");
+const { userRoutes,groupRoutes } = require("./routes/index");
 const { PORT } = require("./config/serverConfig");
 
 const app = express();
@@ -11,6 +11,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/user", userRoutes);
+app.use("/group", groupRoutes);
+
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+
 
 //serving static files
 app.use((req, res) => {

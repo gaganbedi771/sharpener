@@ -14,6 +14,19 @@ exports.findByEmailorPhone = async (email, phone) => {
   }
 };
 
+exports.findByIdAndName = async (id, name) => {
+  try {
+    const user = await User.findOne({
+      where: { id,name},
+    });
+
+    return user;
+  } catch (error) {
+    console.log("error in repository layer", error.message);
+    throw error;
+  }
+};
+
 exports.addUser = async (data) => {
   try {
     const user = await User.create(data);

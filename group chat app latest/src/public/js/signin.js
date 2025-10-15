@@ -14,8 +14,9 @@ form.addEventListener("submit", async (e) => {
     message.style.color = "green";
     message.textContent = res.data.message || "Sign in successful!";
     form.reset();
-    const token= res.data.data.authorization;
-    localStorage.setItem("authorization",token);
+    const {Authorization,userId}= res.data.data;
+    localStorage.setItem("Authorization",Authorization);
+    localStorage.setItem("userId",userId);
     window.location.href = "/chat.html";
   } catch (err) {
     message.style.color = "red";

@@ -38,7 +38,7 @@ exports.signin = async (data) => {
 
     const token= jwtUtil.generateToken({id:user.id,name:user.name});
     
-    return ({authorization:token});
+    return ({Authorization:token, userId:user.id});
   } catch (error) {
     console.log("error in user service", error.message);
     throw error;

@@ -1,41 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Group Chat</title>
   <link rel="stylesheet" href="/css/chat.css">
 </head>
+
 <body>
-  <header>
-    <h2>Group Chat</h2>
+  <header class="chat-header">
+    <h2>Group Chat App</h2>
     <button id="logoutBtn">Logout</button>
   </header>
 
-  <main>
-    <!-- Sidebar -->
+  <main class="chat-container">
+    <!-- Sidebar with groups -->
     <aside class="sidebar">
-      <h3>Rooms</h3>
-      <div class="room-actions">
-        <input type="text" id="roomName" placeholder="Enter room name">
-        <button id="createRoomBtn">Create Room</button>
-        <button id="joinRoomBtn">Join Room</button>
+      <h2>Groups</h2>
+      <ul id="groupList"></ul>
+
+      <div class="group-actions">
+        <input type="text" id="groupNameInput" placeholder="Enter group name">
+        <div class="group-buttons">
+          <button id="createGroupBtn">Create Group</button>
+          <button id="joinGroupBtn">Join Group</button>
+        </div>
       </div>
-      <ul id="roomList"></ul>
     </aside>
 
-    <!-- Chat Section -->
+    <!-- Chat section -->
     <section class="chat-section">
-      <div id="chatWindow" class="chat-window"></div>
-      <form id="chatForm">
-        <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
-        <input type="file" id="fileInput" accept="image/*,video/*,audio/*">
-        <button type="submit">Send</button>
-      </form>
+      <div id="chatWindow" class="chat-window">
+        <p class="placeholder">Select a group to start chatting</p>
+      </div>
+      <div class="chat-actions" style="display:none;" id="chatActions">
+        <form id="chatForm">
+          <input type="text" id="messageInput" placeholder="Type a message...">
+          <button id="attachBtn">📎</button>
+          <input type="file" id="fileInput" style="display:none;">
+          <span id="fileNameDisplay" style="margin-left:10px; color:#555;"></span>
+          <button type="submit">Send</button>
+        </form>
+        <button id="viewMembersBtn">View Members</button>
+      </div>
     </section>
   </main>
+
+  <!-- Modal for group members -->
+  <div id="membersModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="closeModal">&times;</span>
+      <h3>Group Members</h3>
+      <ul id="membersList"></ul>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="/js/chat.js"></script>
 </body>
+
 </html>
