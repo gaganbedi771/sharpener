@@ -43,32 +43,6 @@
     }
   });
 
-  // Toggle group action buttons
-  // groupNameInput.addEventListener("input", async () => {
-  //   const group = groupNameInput.value.trim();
-  //   if (!group) {
-  //     createGroupBtn.style.display = "none";
-  //     joinGroupBtn.style.display = "none";
-  //     return;
-  //   }
-
-  //   try {
-  //     const token = localStorage.getItem("Authorization");
-  //     const res = await axios.get(`http://localhost:3000/group/?name=${group}`, {
-  //       headers: { Authorization: token },
-  //     });
-
-  //     if (res.data.exists) {
-  //       joinGroupBtn.style.display = "inline-block";
-  //     } else {
-  //       createGroupBtn.style.display = "inline-block";
-  //     }
-  //   } catch (err) {
-  //     console.error("Error checking group:", err.response?.data || err);
-  //   }
-  // });
-
-  // Create group
 
   createGroupBtn.addEventListener("click", async () => {
     const name = groupNameInput.value.trim();
@@ -219,24 +193,6 @@
     chatWindow.appendChild(msgElement);
   }
 
-  // function renderMedia(msg) {
-  //   if (!msg.fileUrl) return "";
-  // console.log(msg);
-  //   const ext = msg.fileUrl.split(".").pop().toLowerCase();
-  //   let type = "";
-  //   if (["png", "jpg", "jpeg", "gif"].includes(ext)) type = "image";
-  //   else if (["mp4", "webm"].includes(ext)) type = "video";
-  //   else if (["mp3", "wav"].includes(ext)) type = "audio";
-
-  //   if (type === "image") {
-  //     return `<br><img src="${msg.fileUrl}" alt="image" style="max-width:200px; cursor:pointer;" onclick="window.open('${msg.fileUrl}','_blank')">`;
-  //   } else if (type === "video") {
-  //     return `<br><video controls src="${msg.fileUrl}" style="max-width:200px;"></video>`;
-  //   } else if (type === "audio") {
-  //     return `<br><audio controls src="${msg.fileUrl}"></audio>`;
-  //   }
-  //   return "";
-  // }
 
   function renderMedia(msg) {
     if (!msg.fileUrl) return "";

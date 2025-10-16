@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const { Server } = require("socket.io");
 const http = require("http");
+require("./utils/archiveMessagesCron");
 
 const { userRoutes, groupRoutes } = require("./routes/index");
 const { PORT } = require("./config/serverConfig");

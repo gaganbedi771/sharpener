@@ -1,4 +1,12 @@
-const { Group, Member, User, Message, sequelize } = require("../models/index");
+const { Op } = require("sequelize");
+const {
+  Group,
+  Member,
+  User,
+  Message,
+  sequelize,
+  ArchivedMessage,
+} = require("../models/index");
 
 exports.getGroupsByUserId = async (id) => {
   try {
@@ -142,17 +150,54 @@ exports.sendMessage = async (messageData) => {
       fileUrl: messageData.fileUrl,
     });
 
-// const clickableFileUrl = sentMessage.fileUrl.startsWith("/uploads/") ? sentMessage.fileUrl : `/uploads/${sentMessage.fileUrl}`;
+    // const clickableFileUrl = sentMessage.fileUrl.startsWith("/uploads/") ? sentMessage.fileUrl : `/uploads/${sentMessage.fileUrl}`;
 
     const refinedMessages = {
       message: sentMessage.message,
       senderId: sentMessage.userId,
       createdAt: sentMessage.createdAt,
       fileUrl: sentMessage.fileUrl,
-      senderName:messageData.username
+      senderName: messageData.username,
       // fileUrl: clickableFileUrl,
     };
     return refinedMessages;
+  } catch (error) {
+    console.log("Error at repository", error);
+    throw error;
+  }
+};
+
+exports.findOlderMessages = async () => {
+  try {
+    return Message.findAll({
+      where: {
+        [Op.lt]: new Date(),
+      },
+    });
+  } catch (error) {
+    console.log("Error at repository", error);
+    throw error;
+  }
+};
+
+exports.bulkCreateArchive = async (dataArray) => {
+  try {
+    return ArchivedMessage.bulkCreate(dataArray);
+  } catch (error) {
+    console.log("Error at repository", error);
+    throw error;
+  }
+};
+
+exports.bulkDestroyArchivedData = async (dataArray) => {
+  try {
+    return Message.destroy({
+      where: {
+        id: dataArray.map((msg) => {
+          msg.id;
+        }),
+      },
+    });
   } catch (error) {
     console.log("Error at repository", error);
     throw error;
