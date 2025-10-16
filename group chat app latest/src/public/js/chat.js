@@ -14,6 +14,18 @@
   const closeModal = document.getElementById("closeModal");
   const membersList = document.getElementById("membersList");
 
+  const socket = io("http://localhost:3000");
+
+  // Listen for real-time messages
+  socket.on("receiveMessage", (data) => {
+    // Only render if the current group matches the message group
+    if (data.groupId === currentGroup) {
+      console.log(data);
+      renderMessage(data);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+  });
+
   let currentGroup = null;
   let refreshInterval;
 
@@ -22,14 +34,14 @@
     window.location.href = "/signin.html";
   });
 
-fileInput.addEventListener("change", () => {
-  const fileNameDisplay = document.getElementById("fileNameDisplay");
-  if (fileInput.files.length > 0) {
-    fileNameDisplay.textContent = fileInput.files[0].name;
-  } else {
-    fileNameDisplay.textContent = "";
-  }
-});
+  fileInput.addEventListener("change", () => {
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    if (fileInput.files.length > 0) {
+      fileNameDisplay.textContent = fileInput.files[0].name;
+    } else {
+      fileNameDisplay.textContent = "";
+    }
+  });
 
   // Toggle group action buttons
   // groupNameInput.addEventListener("input", async () => {
@@ -111,6 +123,8 @@ fileInput.addEventListener("change", () => {
     li.addEventListener("click", () => {
       currentGroup = group.id;
 
+      socket.emit("joinGroup", currentGroup);
+
       // Highlight the selected group
       document.querySelectorAll("#groupList li").forEach((item) => {
         item.classList.remove("selected-group");
@@ -176,79 +190,74 @@ fileInput.addEventListener("change", () => {
   }
 
   function renderMessage(msg) {
-  const msgElement = document.createElement("div");
-  msgElement.classList.add("chat-message");
+    const msgElement = document.createElement("div");
+    msgElement.classList.add("chat-message");
 
-  const userId = localStorage.getItem("userId");
-  const time = new Date(msg.createdAt).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    const userId = localStorage.getItem("userId");
+    const time = new Date(msg.createdAt).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     // Align messages based on sender
-  if (msg.senderId == userId) {
-    msgElement.classList.add("sent-message"); // Right side
-     msgElement.innerHTML = `
+    if (msg.senderId == userId) {
+      msgElement.classList.add("sent-message"); // Right side
+      msgElement.innerHTML = `
      ${msg.message || ""}
     ${msg.fileUrl ? renderMedia(msg) : ""}
     <span class="message-time">${time}</span>
   `;
-  } else {
-    msgElement.classList.add("received-message"); // Left side
-     msgElement.innerHTML = `
+    } else {
+      msgElement.classList.add("received-message"); // Left side
+      msgElement.innerHTML = `
     <span><b>${msg.senderName}:</b></span> ${msg.message || ""}
     ${msg.fileUrl ? renderMedia(msg) : ""}
     <span class="message-time">${time}</span>
   `;
+    }
+
+    chatWindow.appendChild(msgElement);
   }
 
- 
+  // function renderMedia(msg) {
+  //   if (!msg.fileUrl) return "";
+  // console.log(msg);
+  //   const ext = msg.fileUrl.split(".").pop().toLowerCase();
+  //   let type = "";
+  //   if (["png", "jpg", "jpeg", "gif"].includes(ext)) type = "image";
+  //   else if (["mp4", "webm"].includes(ext)) type = "video";
+  //   else if (["mp3", "wav"].includes(ext)) type = "audio";
 
-  chatWindow.appendChild(msgElement);
-}
+  //   if (type === "image") {
+  //     return `<br><img src="${msg.fileUrl}" alt="image" style="max-width:200px; cursor:pointer;" onclick="window.open('${msg.fileUrl}','_blank')">`;
+  //   } else if (type === "video") {
+  //     return `<br><video controls src="${msg.fileUrl}" style="max-width:200px;"></video>`;
+  //   } else if (type === "audio") {
+  //     return `<br><audio controls src="${msg.fileUrl}"></audio>`;
+  //   }
+  //   return "";
+  // }
 
+  function renderMedia(msg) {
+    if (!msg.fileUrl) return "";
 
-// function renderMedia(msg) {
-//   if (!msg.fileUrl) return "";
-// console.log(msg);
-//   const ext = msg.fileUrl.split(".").pop().toLowerCase();
-//   let type = "";
-//   if (["png", "jpg", "jpeg", "gif"].includes(ext)) type = "image";
-//   else if (["mp4", "webm"].includes(ext)) type = "video";
-//   else if (["mp3", "wav"].includes(ext)) type = "audio";
+    const ext = msg.fileUrl.split(".").pop().toLowerCase();
+    let type = "";
+    if (["png", "jpg", "jpeg", "gif"].includes(ext)) type = "image";
+    else if (["mp4", "webm"].includes(ext)) type = "video";
+    else if (["mp3", "wav"].includes(ext)) type = "audio";
 
-//   if (type === "image") {
-//     return `<br><img src="${msg.fileUrl}" alt="image" style="max-width:200px; cursor:pointer;" onclick="window.open('${msg.fileUrl}','_blank')">`;
-//   } else if (type === "video") {
-//     return `<br><video controls src="${msg.fileUrl}" style="max-width:200px;"></video>`;
-//   } else if (type === "audio") {
-//     return `<br><audio controls src="${msg.fileUrl}"></audio>`;
-//   }
-//   return "";
-// }
-
-function renderMedia(msg) {
-  if (!msg.fileUrl) return "";
-  
-  const ext = msg.fileUrl.split(".").pop().toLowerCase();
-  let type = "";
-  if (["png", "jpg", "jpeg", "gif"].includes(ext)) type = "image";
-  else if (["mp4", "webm"].includes(ext)) type = "video";
-  else if (["mp3", "wav"].includes(ext)) type = "audio";
-
-  if (type === "image") {
-    // Use JS listener to avoid inline onclick issues
-    const encodedUrl = encodeURIComponent(msg.fileUrl);
-    return `<br><img src="${msg.fileUrl}" alt="image" style="max-width:200px; cursor:pointer;" onclick="window.open(decodeURIComponent('${encodedUrl}'),'_blank')">`;
-  } else if (type === "video") {
-    return `<br><video controls src="${msg.fileUrl}" style="max-width:200px;"></video>`;
-  } else if (type === "audio") {
-    return `<br><audio controls src="${msg.fileUrl}"></audio>`;
+    if (type === "image") {
+      // Use JS listener to avoid inline onclick issues
+      const encodedUrl = encodeURIComponent(msg.fileUrl);
+      return `<br><img src="${msg.fileUrl}" alt="image" style="max-width:200px; cursor:pointer;" onclick="window.open(decodeURIComponent('${encodedUrl}'),'_blank')">`;
+    } else if (type === "video") {
+      return `<br><video controls src="${msg.fileUrl}" style="max-width:200px;"></video>`;
+    } else if (type === "audio") {
+      return `<br><audio controls src="${msg.fileUrl}"></audio>`;
+    }
+    return "";
   }
-  return "";
-}
-
-
 
   // Send message
   chatForm.addEventListener("submit", async (e) => {
@@ -266,12 +275,28 @@ function renderMedia(msg) {
       if (file) formData.append("file", file);
 
       const token = localStorage.getItem("Authorization");
-      const res = await axios.post("http://localhost:3000/group/message", formData, {
-        headers: {
-          Authorization: token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await axios.post(
+        "http://localhost:3000/group/message",
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.data.success) {
+        // Notify others in the same group via socket
+        socket.emit("sendMessage", {
+          groupId: currentGroup,
+          message: res.data.data.message,
+          senderName: res.data.data.senderName,
+          fileUrl: res.data.data.fileUrl || null,
+          createdAt: res.data.data.createdAt,
+        });
+      }
+
       renderMessage(res.data.data);
       chatWindow.scrollTop = chatWindow.scrollHeight;
       messageInput.value = "";

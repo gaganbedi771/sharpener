@@ -142,13 +142,14 @@ exports.sendMessage = async (messageData) => {
       fileUrl: messageData.fileUrl,
     });
 
-const clickableFileUrl = sentMessage.fileUrl.startsWith("/uploads/") ? sentMessage.fileUrl : `/uploads/${sentMessage.fileUrl}`;
+// const clickableFileUrl = sentMessage.fileUrl.startsWith("/uploads/") ? sentMessage.fileUrl : `/uploads/${sentMessage.fileUrl}`;
 
     const refinedMessages = {
       message: sentMessage.message,
       senderId: sentMessage.userId,
       createdAt: sentMessage.createdAt,
       fileUrl: sentMessage.fileUrl,
+      senderName:messageData.username
       // fileUrl: clickableFileUrl,
     };
     return refinedMessages;

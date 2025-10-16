@@ -97,7 +97,7 @@ exports.sendMessage = async (req, res) => {
     const file = req.file;
     const userId = req.user.id;
     console.log(groupId, msg, file);
-    const messages = await groupService.sendMessage(groupId, userId, msg, file);
+    const messages = await groupService.sendMessage(groupId, userId, msg, file,req.user.name);
     return response.sendSuccessResponse(res, 200, messages, "Messages sent");
   } catch (error) {
     return response.sendErrorResponse(

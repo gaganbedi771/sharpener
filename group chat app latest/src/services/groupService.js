@@ -93,7 +93,7 @@ exports.getMessages = async (groupId, userId) => {
   }
 };
 
-exports.sendMessage = async (groupId, userId, msg, file) => {
+exports.sendMessage = async (groupId, userId, msg, file, username) => {
   try {
     const isMember = await groupRepository.isUserInGroup(groupId, userId);
     if (!isMember) {
@@ -102,7 +102,7 @@ exports.sendMessage = async (groupId, userId, msg, file) => {
 
     let fileUrl = null;
     if (file) {
-      fileUrl=file.path;
+      fileUrl = file.path;
     }
 
     const messageData = {
@@ -110,6 +110,7 @@ exports.sendMessage = async (groupId, userId, msg, file) => {
       groupId,
       msg: msg,
       fileUrl,
+      username:username
     };
 
     const messages = await groupRepository.sendMessage(messageData);
